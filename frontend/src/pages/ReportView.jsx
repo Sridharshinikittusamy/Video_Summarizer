@@ -23,9 +23,10 @@ export default function ReportView() {
     const [copied, setCopied] = useState(false);
     const [downloading, setDownloading] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
 
-    const { data: task, loading: loadingTask, error: taskError } = useApi(`http://localhost:8000/analyze/tasks/${taskId}`);
-    const { data: artifacts, loading: loadingArtifacts } = useApi(`http://localhost:8000/analyze/tasks/${taskId}/artifacts`);
+    const { data: task, loading: loadingTask, error: taskError } = useApi(`${import.meta.env.VITE_API_BASE_URL}/analyze/tasks/${taskId}`);
+    const { data: artifacts, loading: loadingArtifacts } = useApi(`${import.meta.env.VITE_API_BASE_URL}/analyze/tasks/${taskId}/artifacts`);
 
     const loading = loadingTask || loadingArtifacts;
     const error = taskError;
@@ -45,7 +46,7 @@ export default function ReportView() {
         if (!artifacts?.pdf_url) return;
         setDownloading(true);
         try {
-            const response = await fetch(`http://localhost:8000${artifacts.pdf_url}`);
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}${artifacts.pdf_url}`);
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -56,7 +57,7 @@ export default function ReportView() {
             link.parentNode.removeChild(link);
         } catch (err) {
             console.error("PDF download failed:", err);
-            window.open(`http://localhost:8000${artifacts.pdf_url}`, '_blank');
+            window.open(`${import.meta.env.VITE_API_BASE_URL}${artifacts.pdf_url}`, '_blank');
         } finally {
             setDownloading(false);
         }
@@ -71,7 +72,7 @@ export default function ReportView() {
 
     const handleDelete = async () => {
         try {
-            const res = await fetch(`http://localhost:8000/analyze/tasks/${taskId}`, { method: 'DELETE' });
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/analyze/tasks/${taskId}`, { method: 'DELETE' });
             if (res.ok) {
                 navigate('/');
             }
@@ -181,11 +182,21 @@ export default function ReportView() {
 
                 <div className="flex items-center gap-2 p-1.5 bg-wood-900/40 border border-white/5 rounded-2xl backdrop-blur-xl">
                     <Button
+                        onClick={() => setIsPdfModalOpen(true)}
+                        size="sm"
+                        variant="secondary"
+                        icon={FileText}
+                        disabled={!artifacts?.pdf_url}
+                        className="bg-white/5 border-white/5 text-wood-400 hover:text-white"
+                    >
+                        View PDF
+                    </Button>
+                    <Button
                         onClick={handleDownloadPDF}
                         size="sm"
                         variant="primary"
                         icon={downloading ? Spinner : Download}
-                        disabled={downloading}
+                        disabled={downloading || !artifacts?.pdf_url}
                         className="bg-accent-gold text-wood-950 font-black shadow-lg shadow-accent-gold/10 hover:bg-white"
                     >
                         {downloading ? 'Preparing...' : 'Download PDF'}
@@ -343,18 +354,18 @@ export default function ReportView() {
                                                         onClick={() => setTranscriptMode('original')}
                                                         className={`px-5 py-2.5 rounded-2xl text-sm font-black transition-all shadow-xl ${transcriptMode === 'original' ? 'bg-accent-gold text-wood-950 shadow-accent-gold/20 scale-105' : 'bg-black/60 text-wood-400 hover:text-white border border-white/5 hover:bg-black'}`}
                                                     >
-                                                        Original Audio 🇬🇧
+                                                        Original Audio 🎧
                                                     </button>
                                                     <button
-                                                        onClick={() => setTranscriptMode('translated')}
-                                                        className={`px-5 py-2.5 rounded-2xl text-sm font-black transition-all shadow-xl ${transcriptMode === 'translated' ? 'bg-accent-gold text-wood-950 shadow-accent-gold/20 scale-105' : 'bg-black/60 text-wood-400 hover:text-white border border-white/5 hover:bg-black'}`}
+                                                        onClick={() => setTranscriptMode('english')}
+                                                        className={`px-5 py-2.5 rounded-2xl text-sm font-black transition-all shadow-xl ${transcriptMode === 'english' ? 'bg-accent-gold text-wood-950 shadow-accent-gold/20 scale-105' : 'bg-black/60 text-wood-400 hover:text-white border border-white/5 hover:bg-black'}`}
                                                     >
-                                                        Translated Notes 🚩 ({task?.language || 'Selected'})
+                                                        English Transcript 🇬🇧
                                                     </button>
                                                 </div>
                                                 <div className="whitespace-pre-wrap font-medium text-wood-300 leading-bold tracking-wide bg-black/40 p-12 md:p-20 rounded-[4rem] border border-white/5 italic text-[1.1rem] shadow-inner">
-                                                    {transcriptMode === 'translated'
-                                                        ? (artifacts?.report_json?.translated_transcript || "The translated transcript is currently unavailable for this session.")
+                                                    {transcriptMode === 'english'
+                                                        ? (artifacts?.report_json?.english_transcript || artifacts?.raw_transcript || "The English transcript is currently unavailable for this session.")
                                                         : (artifacts?.raw_transcript || "The original transcript is currently unavailable.")
                                                     }
                                                 </div>
@@ -385,7 +396,7 @@ export default function ReportView() {
                                                 {task.slides?.map((slideUrl, idx) => (
                                                     <div key={idx} className="group relative bg-black/40 border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-accent-gold/40 transition-all shadow-2xl">
                                                         <img
-                                                            src={`http://localhost:8000${slideUrl}`}
+                                                            src={`${import.meta.env.VITE_API_BASE_URL}${slideUrl}`}
                                                             alt={`Slide ${idx + 1}`}
                                                             className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-1000"
                                                         />
@@ -429,6 +440,50 @@ export default function ReportView() {
                 confirmText="PURGE DATA"
                 variant="danger"
             />
+
+            <AnimatePresence>
+                {isPdfModalOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10 bg-black/80 backdrop-blur-md"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                            className="bg-wood-900/90 border border-white/10 rounded-3xl overflow-hidden w-full max-w-6xl h-full flex flex-col shadow-2xl shadow-black/90"
+                        >
+                            <div className="flex items-center justify-between p-4 bg-black/40 border-b border-white/10">
+                                <h3 className="text-white font-black tracking-tight flex items-center gap-2">
+                                    <FileText size={18} className="text-accent-gold" />
+                                    Intelligence Report PDF
+                                </h3>
+                                <button
+                                    onClick={() => setIsPdfModalOpen(false)}
+                                    className="p-2 text-wood-500 hover:text-white bg-white/5 rounded-full transition-colors"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                            <div className="flex-1 w-full bg-white">
+                                {artifacts?.pdf_url ? (
+                                    <iframe
+                                        src={`${import.meta.env.VITE_API_BASE_URL}${artifacts.pdf_url}#toolbar=0&navpanes=0&scrollbar=0`}
+                                        className="w-full h-full border-none"
+                                        title="PDF Viewer"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-wood-500">
+                                        PDF not available.
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

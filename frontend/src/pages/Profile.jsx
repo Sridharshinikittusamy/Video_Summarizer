@@ -25,7 +25,7 @@ export default function Profile() {
         const fetchSettings = async () => {
             if (!user?.id) return;
             try {
-                const response = await fetch(`http://localhost:8000/analyze/settings?user_id=${user.id}`);
+                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/analyze/settings?user_id=${user.id}`);
                 const data = await response.json();
                 if (data?.groq_api_key) {
                     setGroqKey(data.groq_api_key);
@@ -38,9 +38,7 @@ export default function Profile() {
     }, [user?.id]);
 
     // Statistics Protection
-    const { data: tasks, loading: statsLoading } = useApi(
-        user?.id ? `http://localhost:8000/analyze/tasks?user_id=${user.id}` : null
-    );
+    user?.id ? `${import.meta.env.VITE_API_BASE_URL}/analyze/tasks?user_id=${user.id}` : null
     const completedCount = tasks?.length || 0;
 
     const handleValidateKey = async () => {
@@ -48,7 +46,7 @@ export default function Profile() {
         setIsValidating(true);
         setValidationResult(null);
         try {
-            const response = await fetch('http://localhost:8000/analyze/validate-groq', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/analyze/validate-groq`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ api_key: groqKey })
@@ -70,7 +68,7 @@ export default function Profile() {
         if (!user?.id) return;
         setIsSaving(true);
         try {
-            const response = await fetch('http://localhost:8000/analyze/settings', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/analyze/settings`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
@@ -213,7 +211,7 @@ export default function Profile() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-10 border-t border-white/5 mt-10">
                                     <IntegrationFeature icon={Zap} title="Extreme Ingest" desc="Llama 3.3 Powered" />
-                                    <IntegrationFeature icon={Globe} title="Neural Sync" desc="Tamil Optimized" />
+                                    <IntegrationFeature icon={Globe} title="Neural Sync" desc="Multi-Lingual" />
                                     <IntegrationFeature icon={Shield} title="Vault Protection" desc="Hardware AES" />
                                 </div>
                             </div>
@@ -278,7 +276,7 @@ export default function Profile() {
                             <div className="space-y-4">
                                 <TuneRow title="Neural Telemetry" active={true} desc="Real-time performance broadcasting" />
                                 <TuneRow title="Auto-Summarization" active={false} desc="Passive content distillation" />
-                                <TuneRow title="Multi-Lingual Bridge" active={true} desc="Tamil/English cross-translation" />
+                                <TuneRow title="Multi-Lingual Bridge" active={true} desc="Cross-translation engine" />
                             </div>
                         </Card>
                     </motion.div>

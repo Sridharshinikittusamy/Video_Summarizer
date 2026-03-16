@@ -30,7 +30,7 @@ export default function CreateTask() {
   const [taskStatus, setTaskStatus] = useState(null); // 'pending', 'processing', 'completed', 'failed'
   const [errorMsg, setErrorMsg] = useState(null);
 
-  const { loading: submitting, error: submitError, request: startAnalysis } = useApi('http://localhost:8000/analyze/' + inputType, {
+  const { loading: submitting, error: submitError, request: startAnalysis } = useApi(`${import.meta.env.VITE_API_BASE_URL}/analyze/${inputType}`, {
     method: 'POST',
     manual: true
   });
@@ -41,7 +41,7 @@ export default function CreateTask() {
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`http://localhost:8000/analyze/tasks/${activeTaskId}`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/analyze/tasks/${activeTaskId}`);
         const data = await res.json();
         setTaskStatus(data.status);
         if (data.status === 'failed') setErrorMsg(data.error_msg);

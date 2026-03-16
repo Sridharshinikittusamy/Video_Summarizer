@@ -72,8 +72,16 @@ def download_youtube_audio(url: str, task_id: str) -> tuple[str, str, str | None
         # YouTubeTranscriptApi.get_transcript(video_id) sometimes fails due to property issues
         # list_transcripts() is more robust for finding available langs
         transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-        transcript = transcript_list.find_transcript(['en', 'ta', 'hi', 'tl']).fetch()
-        transcript_text = TextFormatter().format_transcript(transcript)
+        try:
+            # Try a broad array of common languages first
+            common_langs = ['en', 'ta', 'hi', 'te', 'ml', 'kn', 'mr', 'gu', 'bn', 'fr', 'es', 'de', 'ja', 'ko', 'ru', 'pt', 'ar', 'zh', 'it', 'nl']
+            transcript = transcript_list.find_transcript(common_langs)
+        except Exception:
+            # Fallback: grab the first available transcript regardless of language
+            available_langs = [t.language_code for t in transcript_list]
+            transcript = transcript_list.find_transcript(available_langs)
+
+        transcript_text = TextFormatter().format_transcript(transcript.fetch())
         print("   ✅ Transcript API Success.")
         try:
             yt = YouTube(url)

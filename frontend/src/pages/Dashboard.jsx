@@ -76,7 +76,7 @@ export default function Dashboard() {
   const confirmDelete = async () => {
     if (modalConfig.type === 'single') {
       try {
-        const res = await fetch(`http://localhost:8000/analyze/tasks/${modalConfig.id}`, { method: 'DELETE' });
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/analyze/tasks/${modalConfig.id}`, { method: 'DELETE' });
         if (res.ok) {
           refreshTasks();
           setSelectedIds(prev => prev.filter(i => i !== modalConfig.id));
@@ -87,7 +87,7 @@ export default function Dashboard() {
     } else if (modalConfig.type === 'bulk') {
       try {
         await Promise.all(
-          selectedIds.map(id => fetch(`http://localhost:8000/analyze/tasks/${id}`, { method: 'DELETE' }))
+          selectedIds.map(id => fetch(`${import.meta.env.VITE_API_BASE_URL}/analyze/tasks/${id}`, { method: 'DELETE' }))
         );
         setSelectedIds([]);
         refreshTasks();

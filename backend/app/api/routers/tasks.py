@@ -180,7 +180,7 @@ async def process_video_task(
 
         # Launch parallel tasks
         task_report = generate_report_async(transcript_text, v_type, api_key=user_key)
-        task_trans = translate_transcript_async(transcript_text, target_lang, api_key=user_key)
+        task_english_trans = translate_transcript_async(transcript_text, "English", api_key=user_key)
         
         task_quiz = None
         if v_type in ["LECTURE", "TUTORIAL"]:
@@ -197,16 +197,16 @@ async def process_video_task(
             visual_task = asyncio.to_thread(extract_frames, local_path, project_folder)
 
         # Wait for results
-        active_tasks = [task_report, task_trans]
+        active_tasks = [task_report, task_english_trans]
         if task_quiz: active_tasks.append(task_quiz)
         if visual_task: active_tasks.append(visual_task)
         
         results = await asyncio.gather(*active_tasks)
         analysis_json = results[0]
         
-        translated_text = results[1] # Original translate_transcript_async result
-        # Inject translated transcript safely into JSON to avoid DB schema migration
-        analysis_json["translated_transcript"] = translated_text
+        english_transcript = results[1] # Always English
+        # Inject english transcript safely into JSON to avoid DB schema migration
+        analysis_json["english_transcript"] = english_transcript
         
         quiz_json = results[2] if task_quiz else None
         
@@ -259,7 +259,7 @@ async def process_video_task(
 async def analyze_youtube(
     background_tasks: BackgroundTasks,
     url: str = Form(...),
-    language: str = Form("Tamil"),
+    language: str = Form("English"),
     user_id: str = Form(...)
 ):
     try:
@@ -294,7 +294,7 @@ async def analyze_youtube(
 async def analyze_file(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    language: str = Form("Tamil"),
+    language: str = Form("English"),
     user_id: str = Form(...)
 ):
     try:

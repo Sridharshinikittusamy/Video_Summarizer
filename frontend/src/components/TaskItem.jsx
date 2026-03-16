@@ -85,7 +85,7 @@ export default function TaskItem({
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
-                      window.open(`http://localhost:8000${task.pdf_url}`, '_blank');
+                      window.open(`${import.meta.env.VITE_API_BASE_URL}${task.pdf_url}`, '_blank');
                     }}
                     variant="secondary"
                     size="sm"
@@ -165,7 +165,7 @@ export default function TaskItem({
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
-                  window.open(`http://localhost:8000${task.pdf_url}`, '_blank');
+                  window.open(`${import.meta.env.VITE_API_BASE_URL}${task.pdf_url}`, '_blank');
                 }}
                 size="sm" variant="ghost" className="h-8 w-8 p-0 hover:text-accent-gold" icon={Download}
               />

@@ -15,7 +15,7 @@ export const TaskProvider = ({ children }) => {
         if (!user?.id) return;
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:8000/analyze/tasks?user_id=${user.id}`);
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/analyze/tasks?user_id=${user.id}`);
             if (!res.ok) throw new Error("Failed to fetch tasks");
             const data = await res.json();
             setTasks(data);
@@ -40,7 +40,7 @@ export const TaskProvider = ({ children }) => {
         if (hasActiveTasks) {
             const interval = setInterval(() => {
                 // Silent refresh
-                fetch(`http://localhost:8000/analyze/tasks?user_id=${user.id}`)
+                fetch(`${import.meta.env.VITE_API_BASE_URL}/analyze/tasks?user_id=${user.id}`)
                     .then(res => res.json())
                     .then(data => setTasks(data))
                     .catch(err => console.error("Polling error:", err));
