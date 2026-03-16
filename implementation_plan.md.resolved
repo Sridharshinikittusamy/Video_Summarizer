@@ -1,0 +1,42 @@
+# Localized Reports & PDF Fixes Implementation Plan
+
+This plan addresses several critical issues in the report generation and UI: the lack of Unicode support in PDFs (Tamil fonts appearing as squares), the need for fully localized summaries, dual-language transcripts, and fixing the quiz component.
+
+## Proposed Changes
+
+### 1. Backend: PDF Generation & Localization
+
+#### [MODIFY] [pdf_service.py](file:///c:/My%20Projects/Video_summara/backend/app/services/pdf_service.py)
+- **Replace `xhtml2pdf` with `weasyprint`**: WeasyPrint has much better support for CSS3 and Unicode fonts.
+- **Font Integration**: Ensure the system has a Tamil-compatible font (like Noto Sans Tamil) or embed a font to fix the "blank squares" issue.
+- **Group Visual Highlights**: Update the HTML template to display images in a grid/grouped format rather than separate full-width slides.
+
+#### [MODIFY] [summarizer_service.py](file:///c:/My%20Projects/Video_summara/backend/app/services/summarizer_service.py)
+- **Direct Translation**: Update [translate_report_async](file:///c:/My%20Projects/Video_summara/backend/app/services/summarizer_service.py#180-196) to ensure it outputs the final report strictly in the target language (Tamil/Hindi etc.) for the primary view.
+- **Dual Transcript Payload**: Ensure both the original and translated transcripts are saved to the artifacts.
+
+#### [MODIFY] [tasks.py](file:///c:/My%20Projects/Video_summara/backend/app/api/routers/tasks.py)
+- **Artifact Update**: Update [process_video_task](file:///c:/My%20Projects/Video_summara/backend/core_processor.py#111-178) to store both `translated_transcript` and `raw_transcript` in Supabase.
+
+### 2. Frontend: UI & Interaction
+
+#### [MODIFY] [ReportView.jsx](file:///c:/My%20Projects/Video_summara/frontend/src/pages/ReportView.jsx)
+- **Dual-Language Transcript Switch**: 
+    - Implement a badge-style toggle inside the Transcript card to switch between "Original" and "Translated (English)".
+- **Quiz Fixes**:
+    - Fix variable mapping (`q.question` vs `q.q`) so questions display correctly.
+    - Implement interactive "Correct/Incorrect" feedback with animations when an option is selected.
+    - Ensure cards are responsive.
+- **Visuals Grouping**:
+    - Refine the visuals tab to group images into a card-based layout instead of single slides.
+
+## Verification Plan
+
+### Automated Tests
+- Run backend processing for a Tamil YouTube video and verify the generated PDF contains actual Tamil characters.
+- Check Supabase [task_artifacts](file:///c:/My%20Projects/Video_summara/backend/app/api/routers/tasks.py#85-95) table for `translated_transcript` column.
+
+### Manual Verification
+- Verify the "Original" vs "English" toggle in the report UI.
+- Test the interactive quiz: select a wrong answer (red highlight) and a correct answer (green highlight).
+- Check the grouped visuals in the report view.

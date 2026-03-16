@@ -1,0 +1,52 @@
+# .gitignore
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+.env
+.env.*
+venv/
+
+# VSCode
+.vscode/
+
+# Node
+node_modules/
+
+# Build
+build/
+dist/
+
+# Output
+output/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.sqlite3    
+*.db
+
+# Reports
+*.md
+# media files
+*.mp3
+*.mp4
+*.wav
+
+# input folders
+input/
+backend/input/
+
+# python
+venv/
+__pycache__/
+
+# node
+node_modules/
