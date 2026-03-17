@@ -38,7 +38,7 @@ export default function Profile() {
     }, [user?.id]);
 
     // Statistics Protection
-    user?.id ? `${import.meta.env.VITE_API_BASE_URL}/analyze/tasks?user_id=${user.id}` : null
+    const { data: tasks } = useApi(user?.id ? `${import.meta.env.VITE_API_BASE_URL}/analyze/tasks?user_id=${user.id}` : null);
     const completedCount = tasks?.length || 0;
 
     const handleValidateKey = async () => {

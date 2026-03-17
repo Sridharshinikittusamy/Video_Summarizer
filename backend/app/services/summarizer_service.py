@@ -1,7 +1,41 @@
 import json
 import asyncio
+import random
+import re
+from functools import wraps
 from groq import AsyncGroq
 from app.core.config import settings
+
+def with_retry(max_retries=5, base_delay=4):
+    """Decorator to automatically retry Groq API calls on 429 Rate Limit errors."""
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            retries = 0
+            while retries < max_retries:
+                try:
+                    return await func(*args, **kwargs)
+                except Exception as e:
+                    error_msg = str(e).lower()
+                    if "429" in error_msg or "rate limit" in error_msg:
+                        retries += 1
+                        if retries >= max_retries:
+                            print(f"   ❌ Max retries reached for {func.__name__}")
+                            raise
+                        
+                        # Try to parse exact wait time from error message
+                        delay = base_delay * (2 ** (retries - 1)) + random.uniform(0, 1)
+                        match = re.search(r"try again in ([\d\.]+)s", error_msg)
+                        if match:
+                            delay = float(match.group(1)) + 1.0 # Add 1s buffer
+                            
+                        print(f"   ⚠️ Rate Limit Hit (429) in {func.__name__}. Retrying in {delay:.2f}s... (Attempt {retries}/{max_retries})")
+                        await asyncio.sleep(delay)
+                    else:
+                        raise e
+            return await func(*args, **kwargs)
+        return wrapper
+    return decorator
 
 # Shared default client
 default_client = AsyncGroq(api_key=settings.GROQ_API_KEY)
@@ -83,6 +117,7 @@ def get_system_prompt(video_type: str) -> tuple[str, str]:
 # LONG VIDEO SAFETY LOGIC
 # ============================================================
 
+@with_retry()
 async def compress_text_chunk(text_chunk, index, api_key: str = None):
     """Helper: Summarizes one chunk to remove fluff."""
     client = get_client(api_key)
@@ -115,6 +150,7 @@ async def compress_transcript_async(text, api_key: str = None):
 # TYPE DETECTION
 # ============================================================
 
+@with_retry()
 async def detect_video_type(text: str, api_key: str = None) -> str:
     """Auto-classifies video type using LLM."""
     client = get_client(api_key)
@@ -134,6 +170,7 @@ async def detect_video_type(text: str, api_key: str = None) -> str:
 # PARALLEL TASKS
 # ============================================================
 
+@with_retry()
 async def generate_report_async(text: str, video_type: str, api_key: str = None) -> dict:
     """Generates the analysis report. Compresses if text is too long."""
     client = get_client(api_key)
@@ -149,6 +186,7 @@ async def generate_report_async(text: str, video_type: str, api_key: str = None)
         )
     return json.loads(res.choices[0].message.content)
 
+@with_retry()
 async def generate_quiz_async(text: str, target_lang: str, api_key: str = None) -> dict:
     """Generates quiz questions for LECTURE/TUTORIAL type videos."""
     client = get_client(api_key)
@@ -166,6 +204,7 @@ async def generate_quiz_async(text: str, target_lang: str, api_key: str = None) 
 # TRANSLATION
 # ============================================================
 
+@with_retry()
 async def translate_text_chunk(text_chunk, target_lang, index, api_key: str = None):
     """Helper: Translates one chunk."""
     client = get_client(api_key)
@@ -189,6 +228,7 @@ async def translate_large_text_parallel(text, target_lang, api_key: str = None):
     results.sort(key=lambda x: x[0])
     return " ".join([r[1] for r in results])
 
+@with_retry()
 async def translate_report_async(english_json: dict, target_lang: str, video_type: str, api_key: str = None) -> str:
     """Translates the analysis report to the target language."""
     client = get_client(api_key)
@@ -207,6 +247,7 @@ async def translate_report_async(english_json: dict, target_lang: str, video_typ
         )
     return res.choices[0].message.content
 
+@with_retry()
 async def translate_transcript_async(text: str, target_lang: str, api_key: str = None) -> str:
     """Translates transcripts. Uses parallel chunking for long text."""
     client = get_client(api_key)

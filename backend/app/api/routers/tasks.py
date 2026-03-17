@@ -186,20 +186,20 @@ async def process_video_task(
         if v_type in ["LECTURE", "TUTORIAL"]:
             task_quiz = generate_quiz_async(transcript_text, target_lang, api_key=user_key)
         
-        # --- STEP 4: VISUAL INTELLIGENCE ---
+        # --- STEP 4: VISUAL INTELLIGENCE (Temporarily Disabled) ---
         project_folder = f"output/{task_id}"
         os.makedirs(project_folder, exist_ok=True)
         visual_task = None
-        if input_type == "youtube":
-            visual_task = asyncio.to_thread(extract_yt_frames, source_value, project_folder)
-        elif input_type == "file" and source_value.lower().endswith(('.mp4', '.mkv', '.mov', '.avi')):
-            local_path = f"{INPUT_DIR}/{source_value}"
-            visual_task = asyncio.to_thread(extract_frames, local_path, project_folder)
+        # if input_type == "youtube":
+        #     visual_task = asyncio.to_thread(extract_yt_frames, source_value, project_folder)
+        # elif input_type == "file" and source_value.lower().endswith(('.mp4', '.mkv', '.mov', '.avi')):
+        #     local_path = f"{INPUT_DIR}/{source_value}"
+        #     visual_task = asyncio.to_thread(extract_frames, local_path, project_folder)
 
         # Wait for results
         active_tasks = [task_report, task_english_trans]
         if task_quiz: active_tasks.append(task_quiz)
-        if visual_task: active_tasks.append(visual_task)
+        # if visual_task: active_tasks.append(visual_task)
         
         results = await asyncio.gather(*active_tasks)
         analysis_json = results[0]
