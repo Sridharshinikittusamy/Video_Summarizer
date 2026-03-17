@@ -1,17 +1,33 @@
-import os
-import re
-import shutil
 from pathlib import Path
 from pytubefix import YouTube
 from pytubefix.cli import on_progress
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import TextFormatter
 import subprocess
+from app.db.supabase_client import supabase
 
 INPUT_DIR = "input"
+BUCKET_NAME = "project-files"
 
 def ensure_input_folder():
     Path(INPUT_DIR).mkdir(exist_ok=True)
+
+def upload_to_supabase(local_path: str, storage_path: str):
+    """Uploads a local file to Supabase storage and removes the local copy."""
+    try:
+        with open(local_path, 'rb') as f:
+            supabase.storage.from_(BUCKET_NAME).upload(
+                path=storage_path,
+                file=f,
+                file_options={"content-type": "audio/mpeg", "x-upsert": "true"}
+            )
+        print(f"   ☁️ Uploaded {local_path} to Supabase Storage: {storage_path}")
+        if os.path.exists(local_path):
+            os.remove(local_path)
+    except Exception as e:
+        print(f"   ⚠️ Supabase Upload Failed: {e}")
+        # Even if cloud fails, we keep the local file as fallback for this process
+        pass
 
 def sanitize_filename(name: str) -> str:
     clean = re.sub(r'[^\w\s-]', '', name)
@@ -103,7 +119,12 @@ def download_youtube_audio(url: str, task_id: str) -> tuple[str, str, str | None
             raise Exception("FFmpeg conversion failed")
         if os.path.exists(raw_path):
             os.remove(raw_path)
-        return title, audio_path, None  # No pre-fetched transcript
+        
+        # Cloud Sync
+        storage_path = f"audio/{task_id}.mp3"
+        upload_to_supabase(audio_path, storage_path)
+        
+        return title, storage_path, None  # No pre-fetched transcript
     except Exception as e:
         raise Exception(f"YouTube download failed: {e}")
 
@@ -114,4 +135,12 @@ def process_local_audio(source_value: str, task_id: str) -> tuple[str, str]:
     title = sanitize_filename(Path(source_value).stem)
     audio_path = f"{INPUT_DIR}/{task_id}.mp3"
     convert_to_mp3(local_path, audio_path)
-    return title, audio_path
+    
+    # Cloud Sync
+    storage_path = f"audio/{task_id}.mp3"
+    upload_to_supabase(audio_path, storage_path)
+    
+    if os.path.exists(local_path):
+        os.remove(local_path)
+    
+    return title, storage_path

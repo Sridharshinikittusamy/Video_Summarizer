@@ -24,6 +24,11 @@ export default function ReportView() {
     const [downloading, setDownloading] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+    const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+    const [emailInput, setEmailInput] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [isSharing, setIsSharing] = useState(false);
+    const [shareStatus, setShareStatus] = useState(null); // 'success' or 'error'
 
     const { data: task, loading: loadingTask, error: taskError } = useApi(`${import.meta.env.VITE_API_BASE_URL}/analyze/tasks/${taskId}`);
     const { data: artifacts, loading: loadingArtifacts } = useApi(`${import.meta.env.VITE_API_BASE_URL}/analyze/tasks/${taskId}/artifacts`);
@@ -64,10 +69,47 @@ export default function ReportView() {
     };
 
     const handleMail = () => {
-        const subject = encodeURIComponent(`Analysis Report: ${task?.title || 'Video Session'}`);
-        const summaryHead = artifacts?.report_markdown ? artifacts.report_markdown.slice(0, 500) + '...' : 'Check out the attached analysis report.';
-        const body = encodeURIComponent(`Video analysis report for: ${task?.title}\n\nSummary Preview:\n${summaryHead}\n\nView the full report in the application.`);
-        window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        setIsEmailModalOpen(true);
+        setEmailError('');
+    };
+
+    const handleShareEmail = async (e) => {
+        e.preventDefault();
+        if (!emailInput || !emailInput.includes('@')) {
+            setEmailError('Please enter a valid email address.');
+            return;
+        }
+
+        setIsSharing(true);
+        setEmailError('');
+
+        try {
+            const formData = new FormData();
+            formData.append('email', emailInput);
+
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/analyze/tasks/${taskId}/share-email`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (res.ok) {
+                setShareStatus('success');
+                setTimeout(() => {
+                    setIsEmailModalOpen(false);
+                    setEmailInput('');
+                    setShareStatus(null);
+                }, 3000);
+            } else {
+                const errData = await res.json();
+                setEmailError(errData.detail || 'Failed to transmit intelligence.');
+                setShareStatus('error');
+            }
+        } catch (err) {
+            setEmailError('Network interruption. Please try again.');
+            setShareStatus('error');
+        } finally {
+            setIsSharing(false);
+        }
     };
 
     const handleDelete = async () => {
@@ -440,6 +482,95 @@ export default function ReportView() {
                 confirmText="PURGE DATA"
                 variant="danger"
             />
+
+            <AnimatePresence>
+                {isEmailModalOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 40 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 40 }}
+                            className="bg-wood-950 border border-white/10 rounded-[3rem] p-10 max-w-lg w-full shadow-2xl relative overflow-hidden"
+                        >
+                            {/* Decorative background element */}
+                            <div className="absolute -top-24 -right-24 w-48 h-48 bg-accent-gold/10 rounded-full blur-[80px]" />
+
+                            <div className="relative">
+                                <div className="w-16 h-16 bg-accent-gold/10 rounded-2xl flex items-center justify-center mb-8 border border-accent-gold/20">
+                                    <Send className="text-accent-gold" size={28} />
+                                </div>
+
+                                <h2 className="text-3xl font-black text-white mb-3 tracking-tight">Transmit Intelligence</h2>
+                                <p className="text-wood-400 text-sm leading-relaxed mb-8">
+                                    Send the comprehensive analysis report and PDF summary directly to a recipient's inbox.
+                                </p>
+
+                                {shareStatus === 'success' ? (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="bg-green-500/10 border border-green-500/20 rounded-2xl p-8 text-center"
+                                    >
+                                        <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <CheckCircle2 className="text-green-400" size={24} />
+                                        </div>
+                                        <h3 className="text-white font-black mb-2">Transmission Successful</h3>
+                                        <p className="text-wood-400 text-[10px] uppercase tracking-wider">Report has been dispatched to {emailInput}</p>
+                                    </motion.div>
+                                ) : (
+                                    <form onSubmit={handleShareEmail} className="space-y-6">
+                                        <div>
+                                            <label className="block text-[10px] font-black text-accent-gold uppercase tracking-[0.3em] mb-3 ml-1">
+                                                Recipient Email Address
+                                            </label>
+                                            <input
+                                                type="email"
+                                                value={emailInput}
+                                                onChange={(e) => setEmailInput(e.target.value)}
+                                                placeholder="intelligence@target.com"
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder:text-wood-700 focus:outline-none focus:border-accent-gold/40 focus:bg-white/[0.08] transition-all"
+                                                required
+                                            />
+                                            {emailError && (
+                                                <motion.p
+                                                    initial={{ opacity: 0, y: -10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    className="text-red-400 text-[10px] mt-3 ml-1 font-bold flex items-center gap-2"
+                                                >
+                                                    <AlertCircle size={12} /> {emailError}
+                                                </motion.p>
+                                            )}
+                                        </div>
+
+                                        <div className="flex gap-4 pt-4">
+                                            <Button
+                                                type="button"
+                                                onClick={() => setIsEmailModalOpen(false)}
+                                                className="flex-1 bg-white/5 border border-white/5 text-wood-400 hover:text-white"
+                                            >
+                                                CANCEL
+                                            </Button>
+                                            <Button
+                                                type="submit"
+                                                disabled={isSharing}
+                                                className="flex-1 bg-accent-gold text-wood-950 font-black shadow-xl shadow-accent-gold/20"
+                                                icon={isSharing ? Spinner : Send}
+                                            >
+                                                {isSharing ? 'TRANSMITTING...' : 'SEND REPORT'}
+                                            </Button>
+                                        </div>
+                                    </form>
+                                )}
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <AnimatePresence>
                 {isPdfModalOpen && (

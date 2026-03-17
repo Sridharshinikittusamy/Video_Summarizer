@@ -2,7 +2,7 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException, Form, UploadFile,
 from app.schemas.task import TaskResponse
 from app.db.supabase_client import supabase
 from app.services.audio_service import (
-    download_youtube_audio, process_local_audio, 
+    download_youtube_audio, process_local_audio,
     ensure_input_folder, INPUT_DIR, get_youtube_title_quick
 )
 from app.services.transcription_service import get_transcript_async
@@ -12,6 +12,8 @@ from app.services.summarizer_service import (
 )
 from app.services.pdf_service import generate_pdf
 from app.services.vision_service import extract_frames, extract_yt_frames
+from app.core.security import encrypt_key, decrypt_key
+from app.services.email_service import send_report_email
 import uuid
 import shutil
 import asyncio
@@ -99,7 +101,10 @@ async def get_settings(user_id: str):
     try:
         res = supabase.table("user_configs").select("groq_api_key").eq("user_id", user_id).execute()
         if res.data:
-            return res.data[0]
+            data = res.data[0]
+            if "groq_api_key" in data and data["groq_api_key"]:
+                data["groq_api_key"] = decrypt_key(data["groq_api_key"])
+            return data
         return {"groq_api_key": ""}
     except Exception as e:
         print(f"❌ Settings Fetch Error: {e}")
@@ -112,15 +117,69 @@ async def save_settings(
 ):
     """Persists user-specific settings like API keys in Supabase."""
     try:
+        # Encrypt key before saving
+        encrypted_key = encrypt_key(groq_api_key.strip()) if groq_api_key else ""
+        
         # Upsert logic: Update if user_id exists, else insert
         res = supabase.table("user_configs").upsert({
             "user_id": user_id,
-            "groq_api_key": groq_api_key
+            "groq_api_key": encrypted_key
         }).execute()
         return {"success": True, "message": "Settings updated safely."}
     except Exception as e:
         print(f"❌ Settings Save Error: {e}")
         raise HTTPException(status_code=500, detail="Failed to persist configuration.")
+
+@router.post("/tasks/{task_id}/share-email")
+async def share_report_via_email(task_id: str, email: str = Form(...)):
+    """Sends the analysis report and PDF via email."""
+    try:
+        # Fetch task details
+        res_task = supabase.table("video_tasks").select("title").eq("id", task_id).execute()
+        if not res_task.data:
+            raise HTTPException(status_code=404, detail="Task not found")
+        title = res_task.data[0].get("title", "Video Analysis Report")
+        
+        subject = f"Neural Analysis Report: {title}"
+        html_content = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                <div style="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md border-top: 5px solid #d4a373;">
+                    <h2 style="color: #333; margin-bottom: 20px;">Your Video Intelligence Report is Ready</h2>
+                    <p style="color: #555; line-height: 1.6;">
+                        The full neural analysis for <strong>"{title}"</strong> has been completed successfully.
+                    </p>
+                    <p style="color: #555; line-height: 1.6;">
+                        We have attached the comprehensive PDF report to this email, which includes the summary, highlights, and insights.
+                    </p>
+                    <br/>
+                    <p style="color: #888; font-size: 12px; border-top: 1px solid #eee; padding-top: 10px;">
+                        Sent securely from your Multi-Lingual Video Summarizer Node.
+                    </p>
+                </div>
+            </body>
+        </html>
+        """
+        
+        pdf_path = f"output/{task_id}/Report.pdf"
+        
+        if not os.path.exists(pdf_path):
+            print(f"   ⚠️ PDF not found at {pdf_path}. Checking alternative paths...")
+            # Fallback check
+            alt_path = f"output/{task_id}/{task_id}_report.pdf"
+            if os.path.exists(alt_path):
+                pdf_path = alt_path
+                print(f"   ✅ Found PDF at alternative path: {pdf_path}")
+            else:
+                print(f"   ❌ PDF completely missing for task {task_id}")
+        
+        print(f"📧 Sending report {task_id} to {email} with attachment {pdf_path}...")
+        send_report_email(recipient_email=email, subject=subject, html_content=html_content, pdf_path=pdf_path)
+        
+        return {"success": True, "message": f"Report successfully transmitted to {email}"}
+    except Exception as e:
+        print(f"❌ Email Share Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ============================================================
 # BACKGROUND WORKER
@@ -148,8 +207,10 @@ async def process_video_task(
             if u_id:
                 res_config = supabase.table("user_configs").select("groq_api_key").eq("user_id", u_id).execute()
                 if res_config.data:
-                    user_key = res_config.data[0].get('groq_api_key')
-                    print(f"   🔑 Using user-provided API key for {u_id}")
+                    encrypted_user_key = res_config.data[0].get('groq_api_key')
+                    if encrypted_user_key:
+                        user_key = decrypt_key(encrypted_user_key)
+                        print(f"   🔑 Using decrypted user-provided API key for {u_id}")
         except Exception as e:
             # Handle scenario where user_configs table might be missing or network error
             print(f"   ⚠️ Could not fetch user config: {e}. Defaulting to system key.")

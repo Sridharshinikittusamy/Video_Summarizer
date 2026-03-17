@@ -16,3 +16,4 @@ sqlalchemy
 aiosqlite
 requests
 fpdf2
+cryptography

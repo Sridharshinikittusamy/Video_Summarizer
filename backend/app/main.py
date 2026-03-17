@@ -23,9 +23,10 @@ async def startup_event():
         print(f"⚠️ Startup cleanup skipped: {e}")
 
 # --- CORS SETUP ---
+from app.core.config import settings
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Restrict this in true production environment
+    allow_origins=[settings.FRONTEND_URL, "http://localhost:5173"],  # Restrict this in true production environment
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -47,6 +48,13 @@ def root():
         "docs": "/docs"
     }
 
+from fastapi import HTTPException
 @app.get("/health", tags=["Health"])
 def health_check():
-    return {"status": "running", "service": "Multipurpose Video Summarizer API"}
+    try:
+        # Lightweight ping to Supabase to verify DB health
+        supabase.table("video_tasks").select("id").limit(1).execute()
+        return {"status": "ok", "service": "Multipurpose Video Summarizer API", "database": "connected"}
+    except Exception as e:
+        print(f"Health check failed: {e}")
+        raise HTTPException(status_code=503, detail="Database connection failed")
