@@ -4,7 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useApi } from '../hooks/useApi';
 import {
     User, Settings, Zap, Key, Shield, Globe, Terminal, Activity,
-    CheckCircle2, AlertCircle, Lock, Moon, Sun, Monitor
+    CheckCircle2, AlertCircle, Lock, Moon, Sun, Monitor, Trash2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Card from '../components/ui/Card';
@@ -113,7 +113,8 @@ export default function Profile() {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2.5 md:py-3 rounded-lg md:rounded-xl text-xs md:text-[10px] font-semibold md:font-black md:uppercase md:tracking-widest transition-all whitespace-nowrap ${isActive ? 'bg-white dark:bg-brand-500 text-brand-600 dark:text-wood-950 shadow-sm dark:shadow-xl dark:shadow-brand-500/20' : 'text-surface-500 dark:text-wood-500 hover:text-surface-900 dark:hover:text-wood-200 hover:bg-surface-50 dark:hover:bg-white/5'}`}
+                                className={`flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2.5 md:py-3 rounded-lg md:rounded-xl text-xs md:text-[10px] font-semibold md:font-black md:uppercase md:tracking-widest transition-all whitespace-nowrap ${isActive ? 'bg-brand-100 dark:bg-brand-500 text-brand-700 dark:text-wood-950 shadow-sm dark:shadow-xl dark:shadow-brand-500/20' : 'text-surface-500 dark:text-wood-500 hover:text-surface-900 dark:hover:text-wood-200 hover:bg-white/10 dark:hover:bg-white/5'}`}
+                                style={{ borderColor: '#D4A373' }}
                             >
                                 <Icon size={14} />
                                 <span>{tab.label}</span>
@@ -132,14 +133,20 @@ export default function Profile() {
                         exit={{ opacity: 0, y: -10 }}
                         className="space-y-8"
                     >
-                        <Card className="p-8 md:p-10 bg-white dark:bg-wood-900/40 border-surface-200 dark:border-white/5 shadow-sm dark:shadow-none relative overflow-hidden">
+                        <Card
+                            style={{ borderColor: '#D4A373' }}
+                            className="p-8 md:p-10 bg-white dark:bg-wood-900/40 border-2 shadow-sm dark:shadow-none relative overflow-hidden"
+                        >
                             <div className="absolute top-0 right-0 p-10 opacity-[0.02] dark:opacity-[0.03] pointer-events-none text-brand-500 dark:text-brand-500">
                                 <Terminal size={240} />
                             </div>
 
                             <div className="mb-10 max-w-2xl relative z-10">
                                 <h3 className="text-xl md:text-2xl font-bold dark:font-black text-surface-900 dark:text-white tracking-tight mb-2 flex items-center gap-3">
-                                    <div className="w-1.5 md:w-2 h-6 md:h-8 bg-brand-500 dark:bg-brand-500 rounded-full" />
+                                    <div
+                                        style={{ backgroundColor: '#D4A373' }}
+                                        className="w-1.5 md:w-2 h-6 md:h-8 rounded-full"
+                                    />
                                     Groq Intelligence Handshake
                                 </h3>
                                 <p className="text-sm md:text-[10px] font-medium md:font-black text-surface-500 dark:text-wood-500 leading-relaxed md:uppercase md:tracking-wider">
@@ -150,11 +157,11 @@ export default function Profile() {
                             <div className="space-y-8 relative z-10">
                                 <div className="space-y-4">
                                     <label className="text-xs md:text-[10px] font-semibold md:font-black text-surface-500 dark:text-wood-500 md:uppercase md:tracking-widest flex items-center gap-2 italic">
-                                        <Lock size={12} className="text-brand-500 dark:text-brand-500" /> Secure Groq API Key
+                                        <Lock size={12} style={{ color: '#D4A373' }} /> Secure Groq API Key
                                     </label>
                                     <div className="flex flex-col lg:flex-row gap-4">
                                         <div className="relative flex-1 group">
-                                            <Key className="absolute left-5 top-1/2 -translate-y-1/2 text-surface-400 dark:text-wood-800 group-focus-within:text-brand-500 dark:group-focus-within:text-brand-500 transition-colors" size={20} />
+                                            <Key className="absolute left-5 top-1/2 -translate-y-1/2 text-surface-400 dark:text-wood-800 group-focus-within:text-brand-500 dark:group-focus-within:text-brand-500 transition-colors" size={20} style={{ color: '#D4A373' }} />
                                             <input
                                                 type="password"
                                                 placeholder="gsk_********************************"
@@ -165,7 +172,8 @@ export default function Profile() {
                                         </div>
                                         <Button
                                             variant="primary"
-                                            className="px-8 md:px-12 py-4 md:py-5 rounded-xl font-bold md:font-black md:uppercase md:tracking-widest text-sm md:text-xs h-auto bg-brand-500 hover:bg-brand-600 dark:bg-brand-500 dark:hover:bg-white dark:text-wood-950 shadow-md dark:shadow-2xl dark:shadow-brand-500/20"
+                                            className="px-8 md:px-12 py-4 md:py-5 rounded-xl font-bold md:font-black md:uppercase md:tracking-widest text-sm md:text-xs h-auto shadow-md dark:shadow-2xl dark:shadow-brand-500/20"
+                                            style={{ backgroundColor: '#D4A373' }}
                                             onClick={handleValidateKey}
                                             loading={isValidating}
                                             disabled={!groqKey.trim()}
@@ -223,21 +231,30 @@ export default function Profile() {
                         animate={{ opacity: 1 }}
                         className="space-y-8"
                     >
-                        <Card className="p-8 md:p-10 bg-white dark:bg-wood-900/40 border-surface-200 dark:border-white/5 shadow-sm dark:shadow-none dark:glass-panel">
+                        <Card
+                            style={{ borderColor: '#D4A373' }}
+                            className="p-8 md:p-10 bg-white border-2 rounded-xl shadow-sm transition-all duration-200 dark:bg-wood-900/40 dark:border-white/5 dark:shadow-none dark:glass-panel"
+                        >
                             <div className="mb-10">
                                 <h3 className="text-2xl font-bold dark:font-black text-surface-900 dark:text-white dark:italic tracking-tight mb-2">Display Mode</h3>
                                 <p className="text-sm md:text-[10px] font-medium md:font-black text-surface-500 dark:text-wood-600 md:uppercase md:tracking-widest">Select your visual interface environment</p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-b border-surface-100 dark:border-white/5 pb-10 mb-10">
-                                <button onClick={() => setTheme('light')} className={`p-6 rounded-2xl border-2 flex flex-col items-center justify-center gap-4 transition-all ${theme === 'light' ? 'border-brand-500 bg-brand-50/50 dark:bg-transparent dark:border-brand-500' : 'border-surface-200 bg-white dark:bg-wood-950 dark:border-white/5 hover:border-surface-300 dark:hover:border-white/10'}`}>
+                                <button onClick={() => setTheme('light')}
+                                    style={{ borderColor: '#D4A373' }}
+                                    className={`p-6 rounded-2xl border-2 flex flex-col items-center justify-center gap-4 transition-all ${theme === 'light' ? 'bg-brand-50/50 dark:bg-transparent shadow-sm shadow-brand-500/10' : 'bg-white dark:bg-wood-950 dark:border-white/5'}`}
+                                >
                                     <div className={`p-3 rounded-full ${theme === 'light' ? 'bg-brand-100 text-brand-600 dark:bg-brand-500/20 dark:text-brand-500' : 'bg-surface-100 text-surface-500 dark:bg-white/5 dark:text-wood-500'}`}>
                                         <Sun size={24} />
                                     </div>
                                     <span className="text-sm font-semibold text-surface-900 dark:text-white">Calm Light</span>
                                 </button>
 
-                                <button onClick={() => setTheme('dark')} className={`p-6 rounded-2xl border-2 flex flex-col items-center justify-center gap-4 transition-all ${theme === 'dark' ? 'border-brand-500 bg-brand-50/50 dark:bg-transparent dark:border-brand-500' : 'border-surface-200 bg-white dark:bg-wood-950 dark:border-white/5 hover:border-surface-300 dark:hover:border-white/10'}`}>
+                                <button onClick={() => setTheme('dark')}
+                                    style={{ borderColor: '#D4A373' }}
+                                    className={`p-6 rounded-2xl border-2 flex flex-col items-center justify-center gap-4 transition-all ${theme === 'dark' ? 'bg-brand-50/50 dark:bg-transparent shadow-sm shadow-brand-500/10' : 'bg-white dark:bg-wood-950 dark:border-white/5'}`}
+                                >
                                     <div className={`p-3 rounded-full ${theme === 'dark' ? 'bg-brand-100 text-brand-600 dark:bg-brand-500/20 dark:text-brand-500' : 'bg-surface-100 text-surface-500 dark:bg-white/5 dark:text-wood-500'}`}>
                                         <Moon size={24} />
                                     </div>
@@ -265,9 +282,15 @@ export default function Profile() {
                         animate={{ opacity: 1 }}
                         className="space-y-8"
                     >
-                        <Card className="p-8 md:p-12 bg-white dark:bg-wood-900/40 border-surface-200 dark:border-white/5 shadow-sm dark:shadow-none flex flex-col items-center text-center dark:glass-panel">
+                        <Card
+                            style={{ borderColor: '#D4A373' }}
+                            className="p-8 md:p-12 bg-white dark:bg-wood-900/40 border-2 shadow-sm dark:shadow-none flex flex-col items-center text-center dark:glass-panel"
+                        >
                             <div className="relative mb-8 group">
-                                <div className="w-24 h-24 md:w-36 md:h-36 rounded-full md:rounded-[2.5rem] bg-brand-100 dark:bg-brand-500 flex items-center justify-center text-brand-600 dark:text-wood-950 shadow-sm dark:shadow-2xl relative z-10">
+                                <div
+                                    style={{ backgroundColor: '#D4A373' }}
+                                    className="w-24 h-24 md:w-36 md:h-36 rounded-full md:rounded-[2.5rem] flex items-center justify-center text-white shadow-sm dark:shadow-2xl relative z-10"
+                                >
                                     <User size={48} className="md:w-[56px] md:h-[56px]" />
                                 </div>
                                 <div className="absolute -inset-4 bg-brand-400/20 dark:bg-brand-500/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -275,8 +298,8 @@ export default function Profile() {
                             <h3 className="text-3xl md:text-4xl font-bold md:font-black text-surface-900 dark:text-white dark:tracking-tighter dark:italic mb-2">{user?.name || "System Architect"}</h3>
                             <p className="text-sm font-medium md:font-black text-surface-500 dark:text-wood-500 md:uppercase md:tracking-widest">{user?.email || "admin@videoneural.ai"}</p>
                             <div className="mt-12 flex flex-col sm:flex-row gap-4 w-full max-w-md">
-                                <Button variant="secondary" size="lg" className="flex-1 py-4 md:py-5 rounded-xl md:rounded-3xl font-semibold md:font-black md:uppercase text-sm md:text-[10px] md:tracking-[0.2em] dark:border-white/5">Modify Vault</Button>
-                                <Button variant="secondary" size="lg" className="flex-1 py-4 md:py-5 rounded-xl md:rounded-3xl font-semibold md:font-black md:uppercase text-sm md:text-[10px] md:tracking-[0.2em] text-red-600 dark:text-red-500 border-red-200 bg-red-50 hover:bg-red-100 dark:bg-transparent dark:border-red-500/10 dark:hover:bg-red-500/5">Terminate</Button>
+                                <Button variant="secondary" size="lg" className="flex-1 py-4 md:py-5 rounded-xl md:rounded-3xl font-semibold md:font-black md:uppercase text-sm md:text-[10px] md:tracking-[0.2em] dark:border-white/5" icon={Shield} iconStyle={{ color: '#D4A373' }}>Modify Vault</Button>
+                                <Button variant="secondary" size="lg" className="flex-1 py-4 md:py-5 rounded-xl md:rounded-3xl font-semibold md:font-black md:uppercase text-sm md:text-[10px] md:tracking-[0.2em] text-red-600 dark:text-red-500 border-red-200 bg-red-50 hover:bg-red-100 dark:bg-transparent dark:border-red-500/10 dark:hover:bg-red-500/5" icon={Trash2}>Terminate</Button>
                             </div>
                         </Card>
 
@@ -294,8 +317,8 @@ export default function Profile() {
 function IntegrationFeature({ icon: Icon, title, desc }) {
     return (
         <div className="flex items-center gap-4 group">
-            <div className="w-12 h-12 rounded-xl md:rounded-2xl bg-surface-50 dark:bg-white/5 flex items-center justify-center text-surface-600 dark:text-wood-600 group-hover:text-brand-500 dark:group-hover:text-brand-500 transition-colors border border-surface-200 dark:border-white/5">
-                <Icon size={20} />
+            <div className="w-12 h-12 rounded-xl md:rounded-2xl bg-brand-50 dark:bg-brand-500/10 flex items-center justify-center transition-colors border border-brand-100 dark:border-brand-500/20">
+                <Icon size={20} style={{ color: '#D4A373' }} />
             </div>
             <div>
                 <div className="text-xs md:text-[10px] font-semibold md:font-black text-surface-900 dark:text-white md:uppercase tracking-tight">{title}</div>
@@ -307,10 +330,13 @@ function IntegrationFeature({ icon: Icon, title, desc }) {
 
 function MetricBox({ label, value, icon: Icon }) {
     return (
-        <Card className="p-6 md:p-8 bg-white dark:bg-wood-950/40 border-surface-200 dark:border-white/5 shadow-sm dark:shadow-none flex items-center justify-between group dark:glass-panel">
+        <Card
+            style={{ borderColor: '#D4A373' }}
+            className="p-6 md:p-8 bg-white dark:bg-wood-950/40 border-2 shadow-sm dark:shadow-none flex items-center justify-between group dark:glass-panel"
+        >
             <div className="flex items-center gap-4 md:gap-5">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-surface-50 dark:bg-white/5 flex items-center justify-center text-surface-600 dark:text-wood-700 group-hover:text-brand-500 dark:group-hover:text-brand-500 transition-colors">
-                    <Icon size={20} className="md:w-6 md:h-6" />
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-brand-50 dark:bg-brand-500/10 flex items-center justify-center transition-colors">
+                    <Icon size={20} className="md:w-6 md:h-6" style={{ color: '#D4A373' }} />
                 </div>
                 <span className="text-xs md:text-[10px] font-medium md:font-black text-surface-500 dark:text-wood-500 md:uppercase md:tracking-widest">{label}</span>
             </div>
@@ -321,12 +347,15 @@ function MetricBox({ label, value, icon: Icon }) {
 
 function TuneRow({ title, active, desc }) {
     return (
-        <div className="p-6 md:p-8 rounded-2xl md:rounded-[2rem] bg-surface-50 dark:bg-black/20 border border-surface-200 dark:border-white/5 flex items-center justify-between hover:bg-surface-100 dark:hover:bg-black/30 transition-colors">
+        <div
+            style={{ borderColor: '#D4A373' }}
+            className="p-6 md:p-8 rounded-2xl md:rounded-[2rem] bg-brand-50/30 dark:bg-black/20 border-2 flex items-center justify-between hover:bg-brand-50/50 dark:hover:bg-black/30 transition-colors"
+        >
             <div>
                 <div className="text-sm md:text-xs font-semibold md:font-black text-surface-900 dark:text-white md:uppercase tracking-tight mb-1">{title}</div>
                 <div className="text-xs md:text-[10px] font-medium md:font-bold text-surface-500 dark:text-wood-700 md:uppercase dark:italic tracking-wide">{desc}</div>
             </div>
-            <div className={`w-12 h-6 md:w-14 md:h-7 rounded-full relative transition-all cursor-pointer ${active ? 'bg-brand-500 dark:bg-brand-500 shadow-md dark:shadow-lg dark:shadow-brand-500/20' : 'bg-surface-300 dark:bg-wood-950'}`}>
+            <div className={`w-12 h-6 md:w-14 md:h-7 rounded-full relative transition-all cursor-pointer ${active ? 'bg-brand-500 shadow-md dark:shadow-lg dark:shadow-brand-500/20' : 'bg-surface-300 dark:bg-wood-950'}`} style={active ? { backgroundColor: '#D4A373' } : {}}>
                 <div className={`absolute top-1 w-4 h-4 md:w-5 md:h-5 rounded-full bg-white transition-all ${active ? 'left-7 md:left-8 dark:bg-wood-950 shadow-sm' : 'left-1 dark:bg-wood-800 shadow-sm'}`} />
             </div>
         </div>

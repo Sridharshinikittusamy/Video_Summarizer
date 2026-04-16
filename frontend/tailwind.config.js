@@ -7,18 +7,29 @@ export default {
         sans: ['Inter', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
+      borderRadius: {
+        'xl': '12px',
+        '2xl': '16px',
+        '3xl': '24px',
+      },
+      boxShadow: {
+        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        'soft-lg': '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)',
+        'soft-xl': '0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+      },
       colors: {
         brand: {
-          50: '#FDF8F3',
+          50: '#FDF7F2',
           100: '#FBECE1',
-          200: '#F6D9C0',
-          300: '#F0C29F',
-          400: '#EAB07E',
-          500: '#D4A373', // Primary brand color (Brownish Orange)
-          600: '#B88B5D',
-          700: '#9B7348',
-          800: '#7E5A35',
-          900: '#614324',
+          200: '#F6D9C3',
+          300: '#F1C5A5',
+          400: '#ECB287',
+          500: '#D4A373', // Main Brownish Orange
+          600: '#C08D5B',
+          700: '#8E6743',
+          800: '#5E442D',
+          900: '#2F2216',
+          950: '#17110B',
         },
         wood: {
           100: '#E6DCCF',
@@ -36,7 +47,6 @@ export default {
           gold: '#D4A373'
         },
         surface: {
-          50: '#FAFAFA', // Primary background
           100: '#F4F4F5', // Secondary background
           200: '#E4E4E7', // Borders
           300: '#D4D4D8',

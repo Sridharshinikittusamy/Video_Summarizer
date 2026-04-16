@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
     ChevronLeft, Download, Mail, FileText,
-    Copy, Check, Clock, BookOpen, AlignLeft, Send, Sparkles, Hash,
+    Copy, Check, Clock, BookOpen, AlignLeft, Send, Sparkles, Hash, Eye,
     Image as ImageIcon, Maximize2, Trash2, HelpCircle, AlertCircle, CheckCircle2, FileAudio, Youtube, Brain
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -207,34 +207,45 @@ export default function ReportView() {
         <div className="max-w-7xl mx-auto px-4 md:px-8 pb-20">
             {/* Header Area */}
             <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <Button as={Link} to="/" variant="ghost" size="sm" icon={ChevronLeft} className="-ml-2 mb-6 text-surface-500">
-                        Back to Dashboard
-                    </Button>
-                    <div className="flex items-center gap-2 mb-3">
-                        <Badge variant="default" className="uppercase text-[10px]">{task.input_type || 'asset'}</Badge>
-                        <span className="text-xs font-semibold text-brand-600 dark:text-brand-500 px-2 py-0.5 bg-brand-50 dark:bg-brand-500/10 rounded-full">{task.language} Analysis</span>
+                <div className="flex items-center gap-4 mb-6">
+                    <button
+                        onClick={() => navigate('/')}
+                        className="p-3 rounded-2xl bg-white dark:bg-wood-950 border border-brand-100 dark:border-brand-500/10 text-brand-600 dark:text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-500/5 transition-all shadow-sm group shrink-0"
+                        title="Back to Dashboard"
+                    >
+                        <ChevronLeft size={22} className="group-hover:-translate-x-1 transition-transform" />
+                    </button>
+                    <div>
+                        <div className="flex items-center gap-2 mb-1.5">
+                            <Badge variant="default" className="uppercase text-[10px] font-bold">{task.input_type || 'asset'}</Badge>
+                            <span className="text-[10px] font-bold uppercase tracking-tight text-brand-600 dark:text-brand-500 px-2 py-0.5 bg-brand-50 dark:bg-brand-500/10 rounded-full border border-brand-100 dark:border-brand-500/20">{task.language} Analysis</span>
+                        </div>
+                        <h1 className="text-3xl md:text-4xl font-bold text-brand-900 dark:text-white tracking-tight leading-tight">
+                            {task.title || "Untitled Intelligence"}
+                        </h1>
                     </div>
-                    <h1 className="text-3xl md:text-5xl font-semibold text-surface-900 dark:text-white tracking-tight leading-tight">
-                        {task.title || "Untitled Intelligence"}
-                    </h1>
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
                     <Button
                         onClick={() => setIsPdfModalOpen(true)}
-                        size="sm" variant="secondary" icon={FileText} disabled={!artifacts?.pdf_url}
+                        size="sm" variant="secondary" icon={Eye}
+                        iconStyle={{ color: '#D4A373' }}
+                        disabled={!artifacts?.pdf_url}
                     >
                         View PDF
                     </Button>
                     <Button
                         onClick={handleDownloadPDF}
-                        size="sm" variant="secondary" icon={downloading ? Spinner : Download} disabled={downloading || !artifacts?.pdf_url}
+                        size="sm" variant="secondary"
+                        icon={downloading ? Spinner : Download}
+                        iconStyle={{ color: '#D4A373' }}
+                        disabled={downloading || !artifacts?.pdf_url}
                     >
                         {downloading ? 'Downloading...' : 'Download PDF'}
                     </Button>
-                    <Button onClick={handleMail} size="sm" variant="secondary" className="px-3" icon={Mail} />
-                    <Button onClick={() => setIsDeleteModalOpen(true)} size="sm" variant="ghost" className="px-3 text-surface-400 hover:text-red-600" icon={Trash2} />
+                    <Button onClick={handleMail} size="sm" variant="secondary" className="px-3" icon={Mail} iconStyle={{ color: '#D4A373' }} />
+                    <Button onClick={() => setIsDeleteModalOpen(true)} size="sm" variant="secondary" className="px-3" icon={Trash2} iconStyle={{ color: '#D4A373' }} />
                 </div>
             </div>
 

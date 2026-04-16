@@ -6,16 +6,13 @@
 
 
 :root {
-  --primary: #D4A373;
-  /* Brand Gold/Orange */
-  --primary-hover: #B88B5D;
-  --bg-main: #FDF8F3;
-  /* Subtle brownish-orange tint for warmth */
+  --background: #F8FAFC;
+  --surface: #FFFFFF;
   --card-bg: #FFFFFF;
-  --border-light: #F0E4D7;
-  /* Stronger brand border instead of gray */
-  --text-main: #4A3728;
-  /* Deep brown instead of black */
+  --border: #E2E8F0;
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+  --brand: #D4A373;
 }
 
 .dark {

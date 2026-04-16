@@ -90,6 +90,8 @@ export default function Dashboard() {
             to="/new"
             variant="primary"
             icon={Plus}
+            style={{ backgroundColor: '#D4A373' }}
+            className="text-white shadow-lg shadow-brand-500/30"
           >
             New Analysis
           </Button>

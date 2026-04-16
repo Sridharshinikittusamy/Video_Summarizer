@@ -25,7 +25,10 @@ export default function Layout() {
       >
         <div className="p-6 mb-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-brand-500 rounded-lg flex items-center justify-center shrink-0 shadow-lg shadow-brand-500/30">
+            <div
+              style={{ backgroundColor: '#D4A373' }}
+              className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-lg shadow-brand-500/30"
+            >
               <Sparkles size={20} className="text-white" />
             </div>
             <AnimatePresence>
@@ -65,7 +68,10 @@ export default function Layout() {
 
         <div className="p-4 border-t border-brand-50 dark:border-brand-500/10 bg-brand-50/30 dark:bg-transparent">
           <Link to="/profile" className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/60 dark:hover:bg-brand-500/5 transition-all group">
-            <div className="w-9 h-9 rounded-lg bg-brand-500 flex items-center justify-center shrink-0 shadow-md shadow-brand-500/20">
+            <div
+              style={{ backgroundColor: '#D4A373' }}
+              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-md shadow-brand-500/20"
+            >
               <User size={18} className="text-white" />
             </div>
             {isSidebarOpen && (
@@ -98,10 +104,7 @@ export default function Layout() {
             </button>
           </div>
 
-          <div className="hidden md:flex items-center gap-2 text-xs font-medium text-brand-600 dark:text-brand-500 bg-brand-50 dark:bg-brand-500/10 px-3 py-1.5 rounded-full border border-brand-100 dark:border-brand-500/20">
-            <div className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse" />
-            System Online
-          </div>
+          <div />
 
           <div className="flex items-center gap-4">
             <button className="w-9 h-9 flex items-center justify-center rounded-lg text-surface-500 dark:text-wood-500 hover:bg-surface-100 dark:hover:bg-white/10 transition-colors">

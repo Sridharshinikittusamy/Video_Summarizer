@@ -27,6 +27,8 @@ export default function EmptyState({ title, message, actionVisible = true }) {
                     size="md"
                     icon={Plus}
                     onClick={() => navigate('/new')}
+                    style={{ backgroundColor: '#D4A373' }}
+                    className="text-white shadow-lg shadow-brand-500/30"
                 >
                     Create New Analysis
                 </Button>
