@@ -21,12 +21,12 @@ export default function Layout() {
     <div className="min-h-screen bg-surface-50 dark:bg-[#0B0905] text-surface-900 dark:text-white flex overflow-x-hidden transition-colors">
       {/* Sidebar Navigation */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 bg-surface-50 dark:bg-wood-950/80 border-r border-surface-200 dark:border-white/5 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-64' : 'w-20'} hidden md:flex flex-col`}
+        className={`fixed inset-y-0 left-0 z-40 bg-white dark:bg-wood-950 border-r border-brand-100 dark:border-brand-500/10 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-64' : 'w-20'} hidden md:flex flex-col shadow-sm`}
       >
         <div className="p-6 mb-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-brand-500 rounded-lg flex items-center justify-center shrink-0 shadow-sm dark:shadow-brand-500/20">
-              <Sparkles size={20} className="text-white dark:text-wood-950" />
+            <div className="w-10 h-10 bg-brand-500 rounded-lg flex items-center justify-center shrink-0 shadow-lg shadow-brand-500/30">
+              <Sparkles size={20} className="text-white" />
             </div>
             <AnimatePresence>
               {isSidebarOpen && (
@@ -51,9 +51,10 @@ export default function Layout() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors group ${isActive ? 'bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-500 font-medium' : 'text-surface-500 dark:text-wood-500 hover:bg-surface-100 dark:hover:bg-white/5 hover:text-surface-900 dark:hover:text-wood-300'}`}
+                className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all group relative ${isActive ? 'bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-500 font-semibold shadow-sm' : 'text-surface-500 dark:text-wood-500 hover:bg-brand-50/50 dark:hover:bg-brand-500/5 hover:text-brand-600 dark:hover:text-brand-400'}`}
               >
-                <Icon size={20} className={isActive ? 'text-brand-600 dark:text-brand-500' : 'group-hover:text-surface-700 dark:group-hover:text-wood-400 transition-colors'} />
+                {isActive && <div className="absolute left-0 w-1 h-6 bg-brand-500 rounded-r-full shadow-[0_0_8px_rgba(212,163,115,0.8)]" />}
+                <Icon size={20} className={isActive ? 'text-brand-600 dark:text-brand-500' : 'group-hover:text-brand-500 transition-colors'} />
                 {isSidebarOpen && (
                   <span className="text-sm">{item.name}</span>
                 )}
@@ -62,15 +63,15 @@ export default function Layout() {
           })}
         </nav>
 
-        <div className="p-4 border-t border-surface-200 dark:border-white/5">
-          <Link to="/profile" className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-surface-100 dark:hover:bg-white/5 transition-colors group">
-            <div className="w-8 h-8 rounded-full bg-surface-200 dark:bg-white/10 flex items-center justify-center shrink-0">
-              <User size={16} className="text-surface-500 dark:text-wood-400" />
+        <div className="p-4 border-t border-brand-50 dark:border-brand-500/10 bg-brand-50/30 dark:bg-transparent">
+          <Link to="/profile" className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/60 dark:hover:bg-brand-500/5 transition-all group">
+            <div className="w-9 h-9 rounded-lg bg-brand-500 flex items-center justify-center shrink-0 shadow-md shadow-brand-500/20">
+              <User size={18} className="text-white" />
             </div>
             {isSidebarOpen && (
               <div className="overflow-hidden">
-                <div className="text-sm font-medium text-surface-900 dark:text-wood-200 truncate">System Admin</div>
-                <div className="text-xs text-surface-500 dark:text-wood-500 truncate">Config Workspace</div>
+                <div className="text-sm font-semibold text-brand-900 dark:text-brand-500 truncate">System Admin</div>
+                <div className="text-xs text-brand-600/60 dark:text-wood-500 truncate">Config Workspace</div>
               </div>
             )}
           </Link>
@@ -90,7 +91,7 @@ export default function Layout() {
         className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-64' : 'md:ml-20'}`}
       >
         {/* Top Navigation Bar */}
-        <header className="sticky top-0 z-30 w-full px-6 py-4 bg-white/80 dark:bg-wood-950/60 backdrop-blur-md border-b border-surface-200 dark:border-white/5 flex items-center justify-between transition-colors">
+        <header className="sticky top-0 z-30 w-full px-6 py-4 bg-white/70 dark:bg-wood-950/40 backdrop-blur-xl border-b border-brand-100 dark:border-brand-500/10 flex items-center justify-between transition-all">
           <div className="md:hidden">
             <button className="p-2 bg-surface-100 dark:bg-white/5 border border-surface-200 dark:border-white/10 rounded-lg text-surface-900 dark:text-white">
               <Menu size={20} />

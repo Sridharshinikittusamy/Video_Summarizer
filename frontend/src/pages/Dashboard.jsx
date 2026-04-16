@@ -114,7 +114,7 @@ export default function Dashboard() {
               placeholder="Search by title..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white dark:bg-wood-950/40 border border-surface-200 dark:border-white/5 rounded-lg py-2.5 pl-11 pr-4 text-surface-900 dark:text-white placeholder-surface-400 dark:placeholder-wood-700 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-500/40 focus:border-brand-500 dark:focus:border-brand-500/40 transition-shadow text-sm"
+              className="w-full bg-white dark:bg-wood-950/40 border border-brand-100 dark:border-brand-500/10 rounded-xl py-3 pl-11 pr-4 text-brand-900 dark:text-white placeholder-brand-300 dark:placeholder-wood-700 focus:outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all text-sm shadow-sm"
             />
           </div>
 
@@ -125,18 +125,18 @@ export default function Dashboard() {
             >
               <Filter size={16} /> Filters
             </button>
-            <div className="flex bg-surface-100 dark:bg-wood-950/60 p-1 rounded-lg border border-surface-200 dark:border-white/5">
+            <div className="flex bg-brand-50/50 dark:bg-wood-950/60 p-1 rounded-xl border border-brand-100 dark:border-brand-500/10">
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-white dark:bg-wood-900 shadow-sm text-brand-600 dark:text-brand-500' : 'text-surface-500 dark:text-wood-500'}`}
+                className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white dark:bg-wood-900 shadow-md text-brand-600 dark:text-brand-500' : 'text-brand-400 dark:text-wood-600 hover:text-brand-600 dark:hover:text-brand-400'}`}
               >
-                <LayoutList size={16} />
+                <LayoutList size={18} />
               </button>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-wood-900 shadow-sm text-brand-600 dark:text-brand-500' : 'text-surface-500 dark:text-wood-500'}`}
+                className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-wood-900 shadow-md text-brand-600 dark:text-brand-500' : 'text-brand-400 dark:text-wood-600 hover:text-brand-600 dark:hover:text-brand-400'}`}
               >
-                <Grip size={16} />
+                <Grip size={18} />
               </button>
             </div>
           </div>

@@ -33,7 +33,7 @@ export default function TaskItem({
         layout
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="group relative bg-white dark:bg-wood-900/40 hover:bg-surface-50 dark:hover:bg-wood-800/40 border border-surface-200 dark:border-white/5 hover:border-surface-300 dark:hover:border-white/10 rounded-xl p-4 transition-all"
+        className="group relative bg-white dark:bg-wood-900/40 hover:bg-brand-50/30 dark:hover:bg-brand-500/5 border border-brand-100 dark:border-brand-500/20 hover:border-brand-300 dark:hover:border-brand-500/40 rounded-2xl p-5 transition-all shadow-sm"
       >
         <div className="flex items-center gap-6">
           {/* Selection Indicator */}
@@ -46,8 +46,8 @@ export default function TaskItem({
             </div>
           )}
 
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border border-surface-100 dark:border-white/5 bg-surface-50 dark:bg-wood-950">
-            {task.input_type === 'youtube' ? <Youtube size={18} className="text-red-500" /> : <Upload size={18} className="text-surface-500 dark:text-wood-500" />}
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-brand-100 dark:border-brand-500/10 bg-brand-50 dark:bg-wood-950 text-brand-600 dark:text-brand-500 shadow-sm group-hover:scale-110 transition-transform">
+            {task.input_type === 'youtube' ? <Youtube size={22} /> : <Upload size={22} />}
           </div>
 
           <div className="flex-1 min-w-0">
@@ -55,7 +55,7 @@ export default function TaskItem({
               <h3 className="text-sm font-semibold text-surface-900 dark:text-white truncate">
                 {task.title || 'Untitled Analysis'}
               </h3>
-              <Badge variant={variant} size="sm">
+              <Badge variant={variant} size="md" className="shadow-sm">
                 {label}
               </Badge>
             </div>
@@ -129,13 +129,13 @@ export default function TaskItem({
           {task.title || 'In-Progress Analysis...'}
         </h3>
 
-        <div className="flex items-center gap-3 mt-4 pt-4 border-t border-surface-100 dark:border-white/5 text-xs font-medium text-surface-500 dark:text-wood-400">
+        <div className="flex items-center gap-3 mt-4 pt-4 border-t border-brand-100 dark:border-brand-500/10 text-xs font-semibold text-brand-600 dark:text-wood-400">
           <div className="flex items-center gap-1.5">
-            <Globe size={12} /> {task.language}
+            <Globe size={12} className="text-brand-400" /> {task.language}
           </div>
-          <div className="h-1 w-1 rounded-full bg-surface-300 dark:bg-wood-700" />
+          <div className="h-1 w-1 rounded-full bg-brand-200 dark:bg-wood-700" />
           <div className="flex items-center gap-1.5">
-            <Clock size={12} /> {new Date(task.created_at).toLocaleDateString()}
+            <Clock size={12} className="text-brand-400" /> {new Date(task.created_at).toLocaleDateString()}
           </div>
         </div>
       </div>

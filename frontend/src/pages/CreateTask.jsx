@@ -177,16 +177,22 @@ export default function CreateTask() {
   return (
     <div className="max-w-5xl mx-auto pb-20 px-4 md:px-8">
       {/* Header */}
-      <div className="mb-10 flex flex-col items-start">
-        <Button variant="ghost" size="sm" onClick={() => navigate('/')} icon={ChevronLeft} className="mb-6 -ml-2 text-surface-500 dark:text-wood-400">
-          Back to Dashboard
-        </Button>
-        <h1 className="text-3xl font-semibold text-surface-900 dark:text-white mb-2">
-          New Analysis
-        </h1>
-        <p className="text-surface-500 dark:text-wood-400 text-sm max-w-lg">
-          Submit a new video or YouTube link to generate an intelligent summary.
-        </p>
+      <div className="mb-10 flex items-center gap-4">
+        <button
+          onClick={() => navigate('/')}
+          className="p-3 rounded-2xl bg-white dark:bg-wood-950 border border-brand-100 dark:border-brand-500/10 text-brand-600 dark:text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-500/5 transition-all shadow-sm group"
+          title="Back to Dashboard"
+        >
+          <ChevronLeft size={22} className="group-hover:-translate-x-1 transition-transform" />
+        </button>
+        <div>
+          <h1 className="text-3xl font-bold text-brand-900 dark:text-white">
+            New Analysis
+          </h1>
+          <p className="text-brand-500/60 dark:text-wood-400 text-sm font-medium">
+            Launch a specialized synthetic intelligence pipeline
+          </p>
+        </div>
       </div>
 
       <AnimatePresence mode="wait">
@@ -200,19 +206,21 @@ export default function CreateTask() {
           >
             {/* Left: Input Selection */}
             <div className="lg:col-span-2 space-y-6">
-              <Card className="p-2 bg-surface-50 dark:bg-wood-950/40 border-surface-200 dark:border-white/5 shadow-sm dark:shadow-none">
+              <Card className="p-2 bg-white dark:bg-wood-950/40 border-brand-100 dark:border-brand-500/10 shadow-sm dark:shadow-none">
                 <div className="flex gap-2">
                   <button
-                    onClick={() => { setInputType('youtube'); setFile(null) }}
-                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg transition-all text-sm font-medium ${inputType === 'youtube' ? 'bg-white dark:bg-wood-900 text-surface-900 dark:text-white shadow-sm border border-surface-200 dark:border-white/10' : 'text-surface-500 dark:text-wood-500 hover:text-surface-900 dark:hover:text-wood-300 hover:bg-surface-100/50 dark:hover:bg-white/5'}`}
+                    onClick={() => { setInputType('youtube'); setSourceValue('') }}
+                    style={inputType === 'youtube' ? { backgroundColor: '#D4A373' } : {}}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl transition-all text-sm font-bold ${inputType === 'youtube' ? 'text-white shadow-lg shadow-brand-500/30' : 'bg-transparent text-brand-500/60 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50'}`}
                   >
-                    <Youtube size={16} /> YouTube URL
+                    <Youtube size={18} /> YouTube URL
                   </button>
                   <button
                     onClick={() => { setInputType('file'); setSourceValue('') }}
-                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg transition-all text-sm font-medium ${inputType === 'file' ? 'bg-white dark:bg-wood-900 text-surface-900 dark:text-white shadow-sm border border-surface-200 dark:border-white/10' : 'text-surface-500 dark:text-wood-500 hover:text-surface-900 dark:hover:text-wood-300 hover:bg-surface-100/50 dark:hover:bg-white/5'}`}
+                    style={inputType === 'file' ? { backgroundColor: '#D4A373' } : {}}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl transition-all text-sm font-bold ${inputType === 'file' ? 'text-white shadow-lg shadow-brand-500/30' : 'bg-transparent text-brand-500/60 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50'}`}
                   >
-                    <Video size={16} /> File Upload
+                    <Video size={18} /> File Upload
                   </button>
                 </div>
               </Card>
@@ -229,17 +237,17 @@ export default function CreateTask() {
                             placeholder="https://youtube.com/watch?v=..."
                             value={sourceValue}
                             onChange={(e) => setSourceValue(e.target.value)}
-                            className="w-full bg-white dark:bg-wood-950/60 border border-surface-300 dark:border-white/5 rounded-xl p-4 pl-12 text-surface-900 dark:text-white placeholder-surface-400 dark:placeholder-wood-700 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-500/40 focus:border-brand-500 dark:focus:border-brand-500/40 transition-all font-medium text-sm"
+                            className="w-full bg-white dark:bg-wood-950/60 border-2 border-brand-50 dark:border-brand-500/10 rounded-2xl p-4 pl-12 text-brand-900 dark:text-white placeholder-brand-200 dark:placeholder-wood-700 focus:outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all font-semibold text-sm"
                           />
-                          <Youtube size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-400 dark:text-wood-600 group-focus-within:text-brand-500 dark:group-focus-within:text-brand-500" />
+                          <Youtube size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-300 dark:text-brand-500 group-focus-within:text-brand-500" />
                         </div>
                       </div>
                     </motion.div>
                   ) : (
                     <motion.div key="file" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                       <div>
-                        <label className="block text-sm font-semibold text-surface-700 dark:text-wood-300 mb-2">Upload File</label>
-                        <div className="relative border-2 border-dashed border-surface-300 dark:border-white/10 bg-surface-50 dark:bg-wood-950/40 rounded-xl p-8 flex flex-col items-center justify-center hover:bg-surface-100 dark:hover:bg-white/5 transition-colors cursor-pointer">
+                        <label className="block text-sm font-bold text-brand-900 dark:text-wood-300 mb-2">Upload File</label>
+                        <div className="relative border-2 border-dashed border-brand-100 dark:border-brand-500/20 bg-brand-50/50 dark:bg-wood-950/40 rounded-2xl p-10 flex flex-col items-center justify-center hover:bg-brand-50 dark:hover:bg-brand-500/5 transition-all cursor-pointer group">
                           {file ? (
                             <div className="flex flex-col items-center text-center">
                               <div className="w-12 h-12 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-3">
@@ -293,23 +301,24 @@ export default function CreateTask() {
 
                 <div className="space-y-4">
                   <div className="flex flex-wrap gap-2">
-                    {CORE_LANGS.map(lang => (
+                    {CORE_LANGS.filter(Boolean).map(lang => (
                       <button
                         key={lang}
                         onClick={() => setLanguage(lang)}
-                        className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all border ${language === lang ? 'bg-brand-600 border-brand-600 text-white shadow-sm dark:bg-brand-500 dark:border-brand-500 dark:text-wood-950' : 'bg-white border-surface-200 text-surface-600 hover:bg-surface-50 dark:bg-transparent dark:border-white/10 dark:text-wood-400 dark:hover:bg-white/5'}`}
+                        style={language === lang ? { backgroundColor: '#B88B5D' } : {}}
+                        className={`py-2 px-3 rounded-lg text-xs font-bold transition-all border ${language === lang ? 'border-brand-600 text-white shadow-sm' : 'bg-white border-brand-100 text-brand-700/60 hover:bg-brand-50 dark:bg-transparent dark:border-brand-500/10 dark:text-brand-400'}`}
                       >
                         {lang}
                       </button>
                     ))}
-
-                    <button
-                      onClick={() => setShowAllLangs(!showAllLangs)}
-                      className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all border ${showAllLangs ? 'bg-surface-100 border-surface-300 text-surface-700 dark:bg-white/10 dark:border-white/20 dark:text-white' : 'bg-transparent border-transparent text-brand-600 hover:bg-brand-50 dark:text-brand-500 dark:hover:bg-brand-500/10'}`}
-                    >
-                      {showAllLangs ? "Less" : "+ More"}
-                    </button>
                   </div>
+
+                  <button
+                    onClick={() => setShowAllLangs(!showAllLangs)}
+                    className={`py-2.5 px-4 rounded-xl text-xs font-bold transition-all border border-transparent text-brand-600 dark:text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-500/10`}
+                  >
+                    {showAllLangs ? "Less Options" : "+ More Languages"}
+                  </button>
 
                   <AnimatePresence>
                     {showAllLangs && (
@@ -319,11 +328,12 @@ export default function CreateTask() {
                         exit={{ opacity: 0, height: 0 }}
                         className="flex flex-wrap gap-2 pt-2 overflow-hidden"
                       >
-                        {ALL_LANGS.map(lang => (
+                        {ALL_LANGS.filter(Boolean).map(lang => (
                           <button
                             key={lang}
                             onClick={() => setLanguage(lang)}
-                            className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all border ${language === lang ? 'bg-brand-600 border-brand-600 text-white shadow-sm dark:bg-brand-500 dark:border-brand-500 dark:text-wood-950' : 'bg-white border-surface-200 text-surface-600 hover:bg-surface-50 dark:bg-transparent dark:border-white/10 dark:text-wood-400 dark:hover:bg-white/5'}`}
+                            style={language === lang ? { backgroundColor: '#B88B5D' } : {}}
+                            className={`py-2 px-3 rounded-lg text-xs font-bold transition-all border ${language === lang ? 'border-brand-600 text-white shadow-sm' : 'bg-white border-brand-100 text-brand-700/60 hover:bg-brand-50 dark:bg-transparent dark:border-brand-500/10 dark:text-brand-400'}`}
                           >
                             {lang}
                           </button>

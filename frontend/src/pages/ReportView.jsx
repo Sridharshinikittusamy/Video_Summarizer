@@ -239,23 +239,26 @@ export default function ReportView() {
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex items-center gap-1 mb-8 p-1 bg-surface-100 dark:bg-wood-950/60 rounded-xl w-fit border border-surface-200 dark:border-white/5">
+            <div className="flex items-center gap-1.5 mb-8 p-1.5 bg-brand-50/50 dark:bg-wood-950/60 rounded-2xl w-fit border-2 border-brand-50 dark:border-brand-500/10 shadow-sm">
                 <button
                     onClick={() => setActiveTab('summary')}
-                    className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === 'summary' ? 'bg-white dark:bg-wood-900 text-surface-900 dark:text-white shadow-sm' : 'text-surface-500 dark:text-wood-500 hover:text-surface-700 dark:hover:text-wood-300'}`}
+                    style={activeTab === 'summary' ? { backgroundColor: '#D4A373' } : {}}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'summary' ? 'text-white shadow-lg shadow-brand-500/20' : 'text-brand-500/60 dark:text-wood-500 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-white/40'}`}
                 >
                     <FileText size={16} /> Summary
                 </button>
                 <button
                     onClick={() => setActiveTab('transcript')}
-                    className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === 'transcript' ? 'bg-white dark:bg-wood-900 text-surface-900 dark:text-white shadow-sm' : 'text-surface-500 dark:text-wood-500 hover:text-surface-700 dark:hover:text-wood-300'}`}
+                    style={activeTab === 'transcript' ? { backgroundColor: '#D4A373' } : {}}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'transcript' ? 'text-white shadow-lg shadow-brand-500/20' : 'text-brand-500/60 dark:text-wood-500 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-white/40'}`}
                 >
                     <AlignLeft size={16} /> Transcript
                 </button>
                 {(artifacts?.quiz_json || task.input_type === 'youtube') && (
                     <button
                         onClick={() => setActiveTab('quiz')}
-                        className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === 'quiz' ? 'bg-white dark:bg-wood-900 text-surface-900 dark:text-white shadow-sm' : 'text-surface-500 dark:text-wood-500 hover:text-surface-700 dark:hover:text-wood-300'}`}
+                        style={activeTab === 'quiz' ? { backgroundColor: '#D4A373' } : {}}
+                        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'quiz' ? 'text-white shadow-lg shadow-brand-500/20' : 'text-brand-500/60 dark:text-wood-500 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-white/40'}`}
                     >
                         <HelpCircle size={16} /> Quiz
                     </button>
@@ -263,7 +266,8 @@ export default function ReportView() {
                 {task?.slides?.length > 0 && (
                     <button
                         onClick={() => setActiveTab('visuals')}
-                        className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === 'visuals' ? 'bg-white dark:bg-wood-900 text-surface-900 dark:text-white shadow-sm' : 'text-surface-500 dark:text-wood-500 hover:text-surface-700 dark:hover:text-wood-300'}`}
+                        style={activeTab === 'visuals' ? { backgroundColor: '#D4A373' } : {}}
+                        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'visuals' ? 'text-white shadow-lg shadow-brand-500/20' : 'text-brand-500/60 dark:text-wood-500 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-white/40'}`}
                     >
                         <ImageIcon size={16} /> VisualHighlights
                     </button>
@@ -304,16 +308,18 @@ export default function ReportView() {
                                 ) : activeTab === 'transcript' ? (
                                     <motion.div key="transcript-view" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                                         <div className="flex items-center justify-between mb-8">
-                                            <div className="flex items-center p-1 bg-surface-100 rounded-lg">
+                                            <div className="flex items-center p-1.5 bg-brand-50/50 dark:bg-wood-950/40 border border-brand-100/60 dark:border-brand-500/10 rounded-xl mb-6">
                                                 <button
                                                     onClick={() => setTranscriptMode('original')}
-                                                    className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all ${transcriptMode === 'original' ? 'bg-white dark:bg-wood-900 text-surface-900 dark:text-white shadow-sm' : 'text-surface-500 dark:text-wood-500 hover:text-surface-900 dark:hover:text-wood-200'}`}
+                                                    style={transcriptMode === 'original' ? { backgroundColor: '#D4A373' } : {}}
+                                                    className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${transcriptMode === 'original' ? 'text-white shadow-md shadow-brand-500/20' : 'text-brand-500/60 dark:text-wood-500 hover:text-brand-600 dark:hover:text-brand-400'}`}
                                                 >
                                                     Original Context
                                                 </button>
                                                 <button
                                                     onClick={() => setTranscriptMode('english')}
-                                                    className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all ${transcriptMode === 'english' ? 'bg-white dark:bg-wood-900 text-surface-900 dark:text-white shadow-sm' : 'text-surface-500 dark:text-wood-500 hover:text-surface-900 dark:hover:text-wood-200'}`}
+                                                    style={transcriptMode === 'english' ? { backgroundColor: '#D4A373' } : {}}
+                                                    className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${transcriptMode === 'english' ? 'text-white shadow-md shadow-brand-500/20' : 'text-brand-500/60 dark:text-wood-500 hover:text-brand-600 dark:hover:text-brand-400'}`}
                                                 >
                                                     English Context
                                                 </button>
@@ -359,9 +365,9 @@ export default function ReportView() {
 
                 {/* Info Sidebar */}
                 <div className="lg:col-span-1 space-y-4 lg:sticky lg:top-8">
-                    <Card padding="md" className="bg-surface-50 dark:bg-wood-950/40 border-surface-200 dark:border-white/5">
-                        <h3 className="text-xs font-semibold text-surface-500 uppercase tracking-wider mb-6 flex items-center gap-2">
-                            <Brain size={14} /> Metadata
+                    <Card padding="md" className="bg-white dark:bg-wood-950/40 border-2 border-brand-50 dark:border-brand-500/10 shadow-sm">
+                        <h3 className="text-xs font-bold text-brand-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                            <Brain size={14} /> Metadata Insight
                         </h3>
                         <div className="space-y-5">
                             <div>

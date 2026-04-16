@@ -9,10 +9,13 @@
   --primary: #D4A373;
   /* Brand Gold/Orange */
   --primary-hover: #B88B5D;
-  --bg-main: #FAFAFA;
+  --bg-main: #FDF8F3;
+  /* Subtle brownish-orange tint for warmth */
   --card-bg: #FFFFFF;
-  --border-light: #E4E4E7;
-  --text-main: #18181B;
+  --border-light: #F0E4D7;
+  /* Stronger brand border instead of gray */
+  --text-main: #4A3728;
+  /* Deep brown instead of black */
 }
 
 .dark {
@@ -23,10 +26,10 @@
   /* Deep Wood/Black */
   --card-bg: #141009;
   /* Wood 950 */
-  --border-light: #261F12;
-  /* Wood 900 */
-  --text-main: #E6DCCF;
-  /* Wood 100 */
+  --border-light: #392E19;
+  /* Stronger industrial bronze border */
+  --text-main: #F4EBE0;
+  /* Richer almond text */
 }
 
 body {
