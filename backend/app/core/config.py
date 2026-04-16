@@ -12,6 +12,11 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     EMAIL_FROM: str = ""
     ENCRYPTION_KEY: str = ""
+    REDIS_URL: str = "redis://localhost:6379/0"
+    
+    @property
+    def encryption_key_clean(self) -> str:
+        return self.ENCRYPTION_KEY.strip()
     
     class Config:
         env_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env")

@@ -1,10 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTasks } from '../context/TaskContext';
 import {
-  RefreshCw, LayoutList, Grip,
-  Search, Plus, Sparkles, Clock, Globe, Video, Youtube, Filter, X,
-  Trash2, CheckSquare, Square, MinusSquare
+  RefreshCw, LayoutList, Grip, Search, Plus, Filter, X, Trash2, CheckSquare, Square
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TaskItem from '../components/TaskItem';
@@ -16,42 +14,28 @@ import ConfirmationModal from '../components/ui/ConfirmationModal';
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { tasks, loading, error, refreshTasks } = useTasks();
+  const { tasks, loading, refreshTasks } = useTasks();
 
   const [viewMode, setViewMode] = useState('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilters, setActiveFilters] = useState({
-    status: 'all', // 'all', 'completed', 'processing', 'failed'
+    status: 'all',
     language: 'all',
   });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [modalConfig, setModalConfig] = useState({ isOpen: false, type: null, id: null });
 
-  // Comprehensive Filtering Logic
   const filteredTasks = tasks?.filter(t => {
     const matchesSearch = t.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.input_type?.toLowerCase().includes(searchQuery.toLowerCase());
-
     const matchesStatus = activeFilters.status === 'all' || t.status === activeFilters.status;
     const matchesLanguage = activeFilters.language === 'all' || t.language === activeFilters.language;
-
     return matchesSearch && matchesStatus && matchesLanguage;
   }) || [];
 
-  const toggleSelect = (id) => {
-    setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    );
-  };
-
-  const selectAll = () => {
-    if (selectedIds.length === filteredTasks.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(filteredTasks.map(t => t.id));
-    }
-  };
+  const toggleSelect = (id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  const selectAll = () => setSelectedIds(selectedIds.length === filteredTasks.length ? [] : filteredTasks.map(t => t.id));
 
   const handleDelete = async (id) => {
     setModalConfig({
@@ -65,9 +49,7 @@ export default function Dashboard() {
 
   const handleBulkDelete = async () => {
     setModalConfig({
-      isOpen: true,
-      type: 'bulk',
-      id: null,
+      isOpen: true, type: 'bulk', id: null,
       title: `Delete ${selectedIds.length} Analyses?`,
       message: `You are about to permanently delete ${selectedIds.length} analyses and their associated files.`
     });
@@ -81,97 +63,78 @@ export default function Dashboard() {
           refreshTasks();
           setSelectedIds(prev => prev.filter(i => i !== modalConfig.id));
         }
-      } catch (err) {
-        console.error("Deletion failed:", err);
-      }
+      } catch (err) { console.error("Deletion failed:", err); }
     } else if (modalConfig.type === 'bulk') {
       try {
-        await Promise.all(
-          selectedIds.map(id => fetch(`${import.meta.env.VITE_API_BASE_URL}/analyze/tasks/${id}`, { method: 'DELETE' }))
-        );
+        await Promise.all(selectedIds.map(id => fetch(`${import.meta.env.VITE_API_BASE_URL}/analyze/tasks/${id}`, { method: 'DELETE' })));
         setSelectedIds([]);
         refreshTasks();
-      } catch (err) {
-        console.error("Bulk deletion failed:", err);
-      }
+      } catch (err) { console.error("Bulk deletion failed:", err); }
     }
+    setModalConfig({ ...modalConfig, isOpen: false });
   };
 
   const languages = [...new Set(tasks?.map(t => t.language) || [])];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 pb-20">
-      {/* Header Section */}
-      <div className="relative z-10 mb-10 pb-8 border-b border-white/5 transition-all">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-          <div>
-            <h1 className="text-3xl md:text-5xl font-black text-white tracking-tighter mb-1">
-              AI <span className="text-accent-gold font-black">Summarizer</span>
-            </h1>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-accent-gold animate-pulse" />
-              <p className="text-wood-500 text-[10px] font-black uppercase tracking-widest italic">
-                Analysis Live Dashboard
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Button
-              as={Link}
-              to="/new"
-              variant="primary"
-              size="lg"
-              icon={Plus}
-              className="px-8 shadow-2xl shadow-accent-gold/20 rounded-2xl bg-accent-gold text-wood-950 hover:bg-white transition-all font-black"
-            >
-              New Analysis
-            </Button>
-            <div className="h-10 w-px bg-white/10 mx-2 hidden md:block" />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => refreshTasks()}
-              loading={loading}
-              className="w-12 h-12 p-0 rounded-2xl bg-white/5 border border-white/5"
-            >
-              <RefreshCw size={20} className={loading ? 'animate-spin text-accent-gold' : 'text-wood-400'} />
-            </Button>
-          </div>
+    <div className="pb-24">
+      {/* Page Header */}
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-semibold text-surface-900 dark:text-white tracking-tight">Overview</h1>
+          <p className="text-sm text-surface-500 dark:text-wood-400 mt-1">Manage and view your video summaries.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button
+            as={Link}
+            to="/new"
+            variant="primary"
+            icon={Plus}
+          >
+            New Analysis
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => refreshTasks()}
+            loading={loading}
+            className="w-10 h-10 p-0"
+          >
+            {!loading && <RefreshCw size={18} className="text-surface-600 dark:text-wood-400" />}
+          </Button>
         </div>
       </div>
 
-      {/* Advanced Filter & Search Controls */}
-      <div className="space-y-4 mb-10">
+      {/* Constraints & Controls */}
+      <div className="mb-8 space-y-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-wood-600 group-focus-within:text-accent-gold transition-colors" size={20} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-400 dark:text-wood-600 group-focus-within:text-indigo-500 dark:group-focus-within:text-accent-gold" size={18} />
             <input
               type="text"
-              placeholder="Search by title, source, or keyword..."
+              placeholder="Search by title..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-wood-900/40 border border-white/5 rounded-2xl py-5 pl-14 pr-6 text-white placeholder-wood-800 focus:outline-none focus:border-accent-gold/30 transition-all font-bold text-sm tracking-wide focus:ring-4 focus:ring-accent-gold/5"
+              className="w-full bg-white dark:bg-wood-950/40 border border-surface-200 dark:border-white/5 rounded-lg py-2.5 pl-11 pr-4 text-surface-900 dark:text-white placeholder-surface-400 dark:placeholder-wood-700 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-500/40 focus:border-brand-500 dark:focus:border-brand-500/40 transition-shadow text-sm"
             />
           </div>
 
           <div className="flex gap-2">
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className={`px-6 py-5 rounded-2xl border transition-all flex items-center gap-3 text-xs font-black uppercase tracking-widest ${isFilterOpen || activeFilters.status !== 'all' || activeFilters.language !== 'all' ? 'bg-accent-gold border-accent-gold-dark text-wood-950' : 'bg-white/5 border-white/5 text-wood-500 hover:text-wood-200'}`}
+              className={`px-4 py-2.5 bg-white dark:bg-wood-900/40 border rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${(activeFilters.status !== 'all' || activeFilters.language !== 'all' || isFilterOpen) ? 'border-brand-300 text-brand-600 dark:border-brand-500/50 dark:text-brand-500' : 'border-surface-200 text-surface-700 hover:bg-surface-50 dark:border-white/5 dark:text-wood-300 dark:hover:bg-white/5'}`}
             >
-              <Filter size={18} /> Filters {(activeFilters.status !== 'all' || activeFilters.language !== 'all') && "•"}
+              <Filter size={16} /> Filters
             </button>
-            <div className="flex bg-white/5 p-1.5 rounded-2xl border border-white/5 backdrop-blur-xl shrink-0">
+            <div className="flex bg-surface-100 dark:bg-wood-950/60 p-1 rounded-lg border border-surface-200 dark:border-white/5">
               <button
                 onClick={() => setViewMode('list')}
-                className={`px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 text-xs font-black uppercase tracking-widest ${viewMode === 'list' ? 'bg-accent-gold text-wood-950 shadow-lg shadow-accent-gold/20' : 'text-wood-500'}`}
+                className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-white dark:bg-wood-900 shadow-sm text-brand-600 dark:text-brand-500' : 'text-surface-500 dark:text-wood-500'}`}
               >
                 <LayoutList size={16} />
               </button>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 text-xs font-black uppercase tracking-widest ${viewMode === 'grid' ? 'bg-accent-gold text-wood-950 shadow-lg shadow-accent-gold/20' : 'text-wood-500'}`}
+                className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-wood-900 shadow-sm text-brand-600 dark:text-brand-500' : 'text-surface-500 dark:text-wood-500'}`}
               >
                 <Grip size={16} />
               </button>
@@ -179,7 +142,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Filter Drawer */}
+        {/* Filters Panel Open */}
         <AnimatePresence>
           {isFilterOpen && (
             <motion.div
@@ -188,53 +151,40 @@ export default function Dashboard() {
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
-              <div className="bg-wood-900/40 border border-white/5 rounded-3xl p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="bg-white dark:bg-wood-900/40 border border-surface-200 dark:border-white/5 rounded-xl p-5 grid grid-cols-1 md:grid-cols-2 gap-6 shadow-sm dark:shadow-none dark:glass-panel">
                 <div>
-                  <h4 className="text-[10px] font-black text-wood-500 uppercase tracking-widest mb-4">Status Threshold</h4>
+                  <h4 className="text-xs font-semibold text-surface-500 dark:text-wood-600 uppercase tracking-wider mb-3">Status</h4>
                   <div className="flex flex-wrap gap-2">
                     {['all', 'completed', 'processing', 'failed'].map(s => (
                       <button
                         key={s}
                         onClick={() => setActiveFilters(f => ({ ...f, status: s }))}
-                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${activeFilters.status === s ? 'bg-accent-gold text-wood-950 border-accent-gold' : 'bg-transparent border-white/5 text-wood-600 hover:text-wood-400'}`}
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${activeFilters.status === s ? 'bg-brand-50 border-brand-200 text-brand-700 dark:bg-brand-500/10 dark:border-brand-500/20 dark:text-brand-500' : 'bg-white border-surface-200 text-surface-600 hover:bg-surface-50 dark:bg-transparent dark:border-white/5 dark:text-wood-400 dark:hover:bg-white/5'}`}
                       >
-                        {s}
+                        {s.charAt(0).toUpperCase() + s.slice(1)}
                       </button>
                     ))}
                   </div>
                 </div>
-
                 <div>
-                  <h4 className="text-[10px] font-black text-wood-500 uppercase tracking-widest mb-4">Target Language</h4>
+                  <h4 className="text-xs font-semibold text-surface-500 dark:text-wood-600 uppercase tracking-wider mb-3">Language</h4>
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => setActiveFilters(f => ({ ...f, language: 'all' }))}
-                      className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${activeFilters.language === 'all' ? 'bg-accent-gold text-wood-950 border-accent-gold' : 'bg-transparent border-white/5 text-wood-600 hover:text-wood-400'}`}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${activeFilters.language === 'all' ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-accent-gold/10 dark:border-accent-gold/20 dark:text-accent-gold' : 'bg-white border-surface-200 text-surface-600 hover:bg-surface-50 dark:bg-transparent dark:border-white/5 dark:text-wood-400 dark:hover:bg-white/5'}`}
                     >
-                      All
+                      All Languages
                     </button>
                     {languages.map(l => (
                       <button
                         key={l}
                         onClick={() => setActiveFilters(f => ({ ...f, language: l }))}
-                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${activeFilters.language === l ? 'bg-accent-gold text-wood-950 border-accent-gold' : 'bg-transparent border-white/5 text-wood-600 hover:text-wood-400'}`}
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${activeFilters.language === l ? 'bg-brand-50 border-brand-200 text-brand-700 dark:bg-brand-500/10 dark:border-brand-500/20 dark:text-brand-500' : 'bg-white border-surface-200 text-surface-600 hover:bg-surface-50 dark:bg-transparent dark:border-white/5 dark:text-wood-400 dark:hover:bg-white/5'}`}
                       >
                         {l}
                       </button>
                     ))}
                   </div>
-                </div>
-
-                <div className="flex items-end justify-end">
-                  <button
-                    onClick={() => {
-                      setActiveFilters({ status: 'all', language: 'all' });
-                      setSearchQuery('');
-                    }}
-                    className="text-[10px] font-black text-accent-gold flex items-center gap-2 hover:text-white transition-colors uppercase tracking-widest"
-                  >
-                    Reset Workspace <X size={14} />
-                  </button>
                 </div>
               </div>
             </motion.div>
@@ -242,33 +192,25 @@ export default function Dashboard() {
         </AnimatePresence>
       </div>
 
-      {/* Results Section */}
+      {/* Task List/Grid */}
       <AnimatePresence mode="wait">
         {loading && !tasks ? (
-          <motion.div
-            key="loader"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center py-44 bg-wood-900/20 border border-white/5 rounded-[3rem] border-dashed"
-          >
-            <Spinner size="md" className="mb-6" />
-            <p className="text-wood-500 text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">Synchronizing Records...</p>
+          <motion.div key="loader" className="flex flex-col items-center justify-center py-32">
+            <Spinner size="md" className="mb-4" />
+            <p className="text-surface-500 dark:text-wood-500 text-sm font-medium">Loading analyses...</p>
           </motion.div>
         ) : filteredTasks.length === 0 ? (
           <EmptyState
             key="empty"
-            title={searchQuery || activeFilters.status !== 'all' ? "Target Not Found" : "Vault Empty"}
-            message={searchQuery || activeFilters.status !== 'all' ? "No records match your current filter parameters." : "Initiating your first analysis will populate this command center."}
+            title="No Analyses Found"
+            message="We couldn't find anything matching your filters."
             actionVisible={!searchQuery && activeFilters.status === 'all'}
           />
         ) : (
           <motion.div
             key="results"
             layout
-            className={viewMode === 'grid'
-              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
-              : "flex flex-col gap-4"
-            }
+            className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" : "flex flex-col gap-3"}
           >
             {filteredTasks.map((task) => (
               <TaskItem
@@ -276,7 +218,7 @@ export default function Dashboard() {
                 task={task}
                 viewMode={viewMode}
                 isSelected={selectedIds.includes(task.id)}
-                onSelect={() => toggleSelect(task.id)}
+                onSelect={toggleSelect}
                 onDelete={handleDelete}
                 selectionMode={selectedIds.length > 0}
               />
@@ -285,45 +227,30 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-      {/* Industrial Selection Bar */}
+      {/* Floating Selection Action Bar */}
       <AnimatePresence>
         {selectedIds.length > 0 && (
           <motion.div
-            initial={{ y: 100, opacity: 0 }}
+            initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4"
+            exit={{ y: 50, opacity: 0 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-xl"
           >
-            <div className="bg-wood-900/90 border border-accent-gold/30 backdrop-blur-2xl rounded-3xl p-4 shadow-2xl flex items-center justify-between gap-6">
-              <div className="flex items-center gap-4">
+            <div className="bg-white dark:bg-wood-900 border border-surface-200 dark:border-white/10 rounded-xl p-3 shadow-2xl dark:shadow-[0_0_30px_rgba(0,0,0,0.8)] flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
                 <button
                   onClick={selectAll}
-                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-accent-gold hover:bg-accent-gold hover:text-wood-950 transition-all"
+                  className="w-9 h-9 rounded-lg hover:bg-surface-100 dark:hover:bg-white/5 flex items-center justify-center text-surface-500 dark:text-wood-400 transition-colors"
                 >
-                  {selectedIds.length === filteredTasks.length ? <MinusSquare size={18} /> : <CheckSquare size={18} />}
+                  {selectedIds.length === filteredTasks.length ? <Square size={18} className="fill-brand-500 dark:fill-brand-500 text-brand-600 dark:text-wood-950 border-none rounded-sm" /> : <CheckSquare size={18} />}
                 </button>
-                <div>
-                  <div className="text-white font-black text-sm tracking-tight">{selectedIds.length} Items Selected</div>
-                  <div className="text-[10px] font-black text-wood-500 uppercase tracking-widest">Bulk Management Active</div>
-                </div>
+                <div className="text-sm font-medium text-surface-900 dark:text-white">{selectedIds.length} items selected</div>
               </div>
-
               <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedIds([])}
-                  className="text-[10px] font-black uppercase tracking-widest text-wood-400"
-                >
+                <Button variant="secondary" size="sm" onClick={() => setSelectedIds([])} className="text-surface-500 hover:text-surface-900">
                   Cancel
                 </Button>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  icon={Trash2}
-                  onClick={handleBulkDelete}
-                  className="bg-red-600 hover:bg-red-500 shadow-lg shadow-red-600/20 px-6 font-black"
-                >
+                <Button variant="danger" size="sm" icon={Trash2} onClick={handleBulkDelete}>
                   Delete
                 </Button>
               </div>

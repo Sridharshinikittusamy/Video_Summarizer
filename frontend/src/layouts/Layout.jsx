@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, PlusCircle, Settings,
-  Sparkles, Zap, Bell, User, LogOut, ChevronRight, Menu, X, Shield
+  Sparkles, Bell, User, Menu, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
@@ -18,21 +18,15 @@ export default function Layout() {
   ];
 
   return (
-    <div className="min-h-screen bg-wood-950 text-wood-200 selection:bg-accent-gold/30 flex overflow-x-hidden bg-mesh">
-      {/* Background Decor */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-5%] w-[50%] h-[50%] bg-accent-gold/5 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-wood-500/5 blur-[120px] rounded-full" />
-      </div>
-
-      {/* Industrial Sidebar - Highest Z-Index */}
+    <div className="min-h-screen bg-surface-50 dark:bg-[#0B0905] text-surface-900 dark:text-white flex overflow-x-hidden transition-colors">
+      {/* Sidebar Navigation */}
       <aside
-        className={`fixed inset-y-0 left-0 z-[60] bg-wood-900 border-r border-white/5 transition-all duration-500 ease-in-out ${isSidebarOpen ? 'w-72' : 'w-20'} hidden md:flex flex-col shadow-2xl shadow-black`}
+        className={`fixed inset-y-0 left-0 z-40 bg-surface-50 dark:bg-wood-950/80 border-r border-surface-200 dark:border-white/5 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-64' : 'w-20'} hidden md:flex flex-col`}
       >
-        <div className="p-6 mb-8 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group overflow-hidden">
-            <div className="w-10 h-10 bg-accent-gold rounded-xl flex items-center justify-center shadow-lg shadow-accent-gold/20 shrink-0">
-              <Sparkles size={20} className="text-wood-950" />
+        <div className="p-6 mb-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 bg-brand-500 rounded-lg flex items-center justify-center shrink-0 shadow-sm dark:shadow-brand-500/20">
+              <Sparkles size={20} className="text-white dark:text-wood-950" />
             </div>
             <AnimatePresence>
               {isSidebarOpen && (
@@ -40,9 +34,9 @@ export default function Layout() {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -10 }}
-                  className="font-black text-xl tracking-tighter text-white italic whitespace-nowrap"
+                  className="font-semibold text-lg tracking-tight text-surface-900 dark:text-white whitespace-nowrap"
                 >
-                  AI <span className="text-accent-gold">SUMMARIZER</span>
+                  Neural Core
                 </motion.span>
               )}
             </AnimatePresence>
@@ -57,73 +51,66 @@ export default function Layout() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group ${isActive ? 'bg-accent-gold text-wood-950 shadow-lg shadow-accent-gold/20 font-bold' : 'text-wood-500 hover:bg-white/5 hover:text-wood-200'}`}
+                className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors group ${isActive ? 'bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-500 font-medium' : 'text-surface-500 dark:text-wood-500 hover:bg-surface-100 dark:hover:bg-white/5 hover:text-surface-900 dark:hover:text-wood-300'}`}
               >
-                <Icon size={20} className={isActive ? 'text-wood-950' : 'group-hover:text-accent-gold transition-colors'} />
+                <Icon size={20} className={isActive ? 'text-brand-600 dark:text-brand-500' : 'group-hover:text-surface-700 dark:group-hover:text-wood-400 transition-colors'} />
                 {isSidebarOpen && (
-                  <span className="text-xs font-black uppercase tracking-widest">{item.name}</span>
+                  <span className="text-sm">{item.name}</span>
                 )}
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-4 mt-auto border-t border-white/5 bg-black/20">
-          <Link to="/profile" className="flex items-center gap-4 p-3 rounded-2xl border border-white/5 hover:bg-white/5 transition-all group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-gold to-wood-700 flex items-center justify-center text-white shrink-0 shadow-lg">
-              <User size={18} />
+        <div className="p-4 border-t border-surface-200 dark:border-white/5">
+          <Link to="/profile" className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-surface-100 dark:hover:bg-white/5 transition-colors group">
+            <div className="w-8 h-8 rounded-full bg-surface-200 dark:bg-white/10 flex items-center justify-center shrink-0">
+              <User size={16} className="text-surface-500 dark:text-wood-400" />
             </div>
             {isSidebarOpen && (
               <div className="overflow-hidden">
-                <div className="text-[10px] font-black text-white uppercase truncate tracking-tight">Access Node 01</div>
-                <div className="text-[9px] font-bold text-wood-500 uppercase tracking-tighter">System Authenticated</div>
+                <div className="text-sm font-medium text-surface-900 dark:text-wood-200 truncate">System Admin</div>
+                <div className="text-xs text-surface-500 dark:text-wood-500 truncate">Config Workspace</div>
               </div>
             )}
           </Link>
         </div>
 
+        {/* Desktop Sidebar Toggle */}
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="absolute -right-3 top-20 w-6 h-6 bg-wood-800 rounded-full border border-white/10 flex items-center justify-center text-wood-400 shadow-xl hover:text-accent-gold hover:scale-110 transition-all hidden lg:flex"
+          className="absolute -right-3 top-20 w-6 h-6 bg-white dark:bg-wood-900 border border-surface-200 dark:border-white/10 rounded-full flex items-center justify-center text-surface-500 dark:text-wood-400 shadow-sm hover:text-brand-600 dark:hover:text-brand-500 transition-colors hidden lg:flex"
         >
-          {isSidebarOpen ? <X size={10} /> : <Menu size={10} />}
+          {isSidebarOpen ? <X size={12} /> : <Menu size={12} />}
         </button>
       </aside>
 
-      {/* Main Content Area - Z-Index lower than Sidebar but manages Top Bar */}
+      {/* Main Content Area */}
       <div
-        className={`flex-1 flex flex-col transition-all duration-500 ease-in-out ${isSidebarOpen ? 'md:ml-72' : 'md:ml-20'}`}
+        className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-64' : 'md:ml-20'}`}
       >
-        {/* Industry Top Bar - Secondary Z-Index */}
-        <header className="sticky top-0 z-[50] w-full px-6 py-4 bg-wood-950/80 backdrop-blur-2xl border-b border-white/5 flex items-center justify-between">
+        {/* Top Navigation Bar */}
+        <header className="sticky top-0 z-30 w-full px-6 py-4 bg-white/80 dark:bg-wood-950/60 backdrop-blur-md border-b border-surface-200 dark:border-white/5 flex items-center justify-between transition-colors">
           <div className="md:hidden">
-            <button className="p-2.5 bg-wood-800 border border-white/10 rounded-xl text-white">
+            <button className="p-2 bg-surface-100 dark:bg-white/5 border border-surface-200 dark:border-white/10 rounded-lg text-surface-900 dark:text-white">
               <Menu size={20} />
             </button>
           </div>
 
-          <div className="hidden md:flex items-center gap-4 text-[10px] font-black text-wood-500 uppercase tracking-[0.2em] italic">
-            <div className="w-2 h-2 rounded-full bg-accent-gold animate-pulse" />
-            Neural Link Optimized
+          <div className="hidden md:flex items-center gap-2 text-xs font-medium text-brand-600 dark:text-brand-500 bg-brand-50 dark:bg-brand-500/10 px-3 py-1.5 rounded-full border border-brand-100 dark:border-brand-500/20">
+            <div className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse" />
+            System Online
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-black/40 border border-white/5 p-1 rounded-xl">
-              <Button variant="ghost" size="sm" className="w-9 h-9 p-0 rounded-lg text-wood-400 hover:text-accent-gold hover:bg-white/5">
-                <Bell size={18} />
-              </Button>
-              <Link to="/profile" className="flex items-center gap-2 pr-3 pl-1 py-1 hover:bg-white/5 rounded-lg transition-colors group">
-                <div className="w-7 h-7 bg-accent-gold rounded-md flex items-center justify-center text-wood-950">
-                  <User size={14} />
-                </div>
-                <span className="text-[10px] font-black text-wood-400 group-hover:text-white uppercase tracking-widest hidden sm:block">Settings Node</span>
-              </Link>
-            </div>
+            <button className="w-9 h-9 flex items-center justify-center rounded-lg text-surface-500 dark:text-wood-500 hover:bg-surface-100 dark:hover:bg-white/10 transition-colors">
+              <Bell size={18} />
+            </button>
           </div>
         </header>
 
         {/* Page Content Lane */}
-        <main className="relative z-10 flex-1 p-6 md:p-10 max-w-7xl w-full mx-auto page-transition">
+        <main className="relative z-10 flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto page-transition">
           <Outlet />
         </main>
       </div>

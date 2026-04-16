@@ -5,6 +5,7 @@ import re
 from functools import wraps
 from groq import AsyncGroq
 from app.core.config import settings
+from app.services.cache_service import get_cache_key, get_cached_result, set_cached_result
 
 def with_retry(max_retries=5, base_delay=4):
     """Decorator to automatically retry Groq API calls on 429 Rate Limit errors."""
@@ -152,7 +153,13 @@ async def compress_transcript_async(text, api_key: str = None):
 
 @with_retry()
 async def detect_video_type(text: str, api_key: str = None) -> str:
-    """Auto-classifies video type using LLM."""
+    """Auto-classifies video type using LLM (Cached)."""
+    cache_key = get_cache_key("vtype", text[:5000])
+    cached = get_cached_result(cache_key)
+    if cached:
+        print("   🚀 Cache Hit: Video Type")
+        return cached
+
     client = get_client(api_key)
     sys_p = 'Classify as "LECTURE", "MEETING", "NEWS", or "GENERAL". Return JSON: {"type": "LECTURE"}'
     try:
@@ -161,7 +168,9 @@ async def detect_video_type(text: str, api_key: str = None) -> str:
                 messages=[{"role": "system", "content": sys_p}, {"role": "user", "content": text[:5000]}],
                 model="llama-3.3-70b-versatile", response_format={"type": "json_object"}
             )
-        return json.loads(res.choices[0].message.content).get('type', 'GENERAL')
+        vtype = json.loads(res.choices[0].message.content).get('type', 'GENERAL')
+        set_cached_result(cache_key, vtype)
+        return vtype
     except:
         return "GENERAL"
 
@@ -172,7 +181,13 @@ async def detect_video_type(text: str, api_key: str = None) -> str:
 
 @with_retry()
 async def generate_report_async(text: str, video_type: str, api_key: str = None) -> dict:
-    """Generates the analysis report. Compresses if text is too long."""
+    """Generates the analysis report (Cached)."""
+    cache_key = get_cache_key(f"report:{video_type}", text)
+    cached = get_cached_result(cache_key)
+    if cached:
+        print(f"   🚀 Cache Hit: Report ({video_type})")
+        return cached
+
     client = get_client(api_key)
     if len(text) > 90000:
         text = await compress_transcript_async(text, api_key)
@@ -184,11 +199,19 @@ async def generate_report_async(text: str, video_type: str, api_key: str = None)
             messages=[{"role": "system", "content": f"{sys_msg}\nReturn JSON: {structure}"}, {"role": "user", "content": text[:32000]}],
             model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.3
         )
-    return json.loads(res.choices[0].message.content)
+    result = json.loads(res.choices[0].message.content)
+    set_cached_result(cache_key, result)
+    return result
 
 @with_retry()
 async def generate_quiz_async(text: str, target_lang: str, api_key: str = None) -> dict:
-    """Generates quiz questions for LECTURE/TUTORIAL type videos."""
+    """Generates quiz questions for LECTURE/TUTORIAL type videos (Cached)."""
+    cache_key = get_cache_key(f"quiz:{target_lang}", text)
+    cached = get_cached_result(cache_key)
+    if cached:
+        print("   🚀 Cache Hit: Quiz")
+        return cached
+
     client = get_client(api_key)
     print("   ❓ AI: Generating Quiz...")
     prompt = f"""Generate 5 MCQs in {target_lang}. JSON: {{ "questions": [ {{ "q": "Q?", "options": ["A","B"], "answer": "A" }} ] }}"""
@@ -197,7 +220,9 @@ async def generate_quiz_async(text: str, target_lang: str, api_key: str = None) 
             messages=[{"role": "system", "content": prompt}, {"role": "user", "content": text[:20000]}],
             model="llama-3.3-70b-versatile", response_format={"type": "json_object"}
         )
-    return json.loads(res.choices[0].message.content)
+    result = json.loads(res.choices[0].message.content)
+    set_cached_result(cache_key, result)
+    return result
 
 
 # ============================================================
@@ -230,7 +255,13 @@ async def translate_large_text_parallel(text, target_lang, api_key: str = None):
 
 @with_retry()
 async def translate_report_async(english_json: dict, target_lang: str, video_type: str, api_key: str = None) -> str:
-    """Translates the analysis report to the target language."""
+    """Translates the analysis report to the target language (Cached)."""
+    cache_key = get_cache_key(f"trans_report:{target_lang}", json.dumps(english_json))
+    cached = get_cached_result(cache_key)
+    if cached:
+        print(f"   🚀 Cache Hit: Translated Report ({target_lang})")
+        return cached
+
     client = get_client(api_key)
     print(f"   🌍 AI: Translating Report to {target_lang}...")
     if video_type == "NEWS":
@@ -245,22 +276,34 @@ async def translate_report_async(english_json: dict, target_lang: str, video_typ
             messages=[{"role": "system", "content": prompt}, {"role": "user", "content": json.dumps(english_json)}],
             model="llama-3.3-70b-versatile"
         )
-    return res.choices[0].message.content
+    result = res.choices[0].message.content
+    set_cached_result(cache_key, result)
+    return result
 
 @with_retry()
 async def translate_transcript_async(text: str, target_lang: str, api_key: str = None) -> str:
-    """Translates transcripts. Uses parallel chunking for long text."""
+    """Translates transcripts (Cached). Uses parallel chunking for long text."""
+    cache_key = get_cache_key(f"trans_transcript:{target_lang}", text)
+    cached = get_cached_result(cache_key)
+    if cached:
+        print(f"   🚀 Cache Hit: Full Transcript ({target_lang})")
+        return cached
+
     client = get_client(api_key)
     print("   📜 AI: Translating Full Transcript...")
-    if len(text) > 25000:
-        return await translate_large_text_parallel(text, target_lang, api_key)
     
-    async with GROQ_SEMAPHORE:
-        res = await client.chat.completions.create(
-            messages=[{"role": "system", "content": f"Translate to {target_lang}."}, {"role": "user", "content": text}],
-            model="llama-3.3-70b-versatile"
-        )
-    return res.choices[0].message.content
+    if len(text) > 25000:
+        result = await translate_large_text_parallel(text, target_lang, api_key)
+    else:
+        async with GROQ_SEMAPHORE:
+            res = await client.chat.completions.create(
+                messages=[{"role": "system", "content": f"Translate to {target_lang}."}, {"role": "user", "content": text}],
+                model="llama-3.3-70b-versatile"
+            )
+        result = res.choices[0].message.content
+        
+    set_cached_result(cache_key, result)
+    return result
 
 
 # ============================================================

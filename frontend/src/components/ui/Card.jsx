@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -9,8 +8,7 @@ function cn(...inputs) {
 export default function Card({
     children,
     className,
-    glass = true,
-    hover = true,
+    hover = false,
     padding = 'md',
     ...props
 }) {
@@ -18,15 +16,14 @@ export default function Card({
         none: "",
         sm: "p-4",
         md: "p-6",
-        lg: "p-8 md:p-12"
+        lg: "p-8 md:p-10"
     };
 
     return (
         <div
             className={cn(
-                "rounded-[2rem] border transition-all duration-300",
-                glass ? "bg-wood-900/40 border-white/5 backdrop-blur-xl shadow-2xl shadow-black/40" : "bg-wood-950 border-white/10 shadow-2xl shadow-black/60",
-                hover && "hover:border-accent-gold/30 hover:shadow-accent-gold/5",
+                "bg-white border border-surface-200 rounded-xl shadow-sm transition-all duration-200 dark:bg-wood-900/40 dark:border-white/5 dark:shadow-none dark:glass-panel",
+                hover && "hover:border-surface-300 hover:shadow-md dark:hover:border-white/10 dark:hover:shadow-lg dark:hover:shadow-black/50",
                 paddings[padding],
                 className
             )}

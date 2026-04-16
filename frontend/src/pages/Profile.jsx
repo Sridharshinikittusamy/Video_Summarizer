@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { useApi } from '../hooks/useApi';
 import {
-    User, Mail, Shield, Bell, Key, Globe,
-    Settings, Clock, CheckCircle2, AlertCircle,
-    Save, Zap, Database, Lock, Terminal, Activity
+    User, Settings, Zap, Key, Shield, Globe, Terminal, Activity,
+    CheckCircle2, AlertCircle, Lock, Moon, Sun, Monitor
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Card from '../components/ui/Card';
@@ -14,13 +14,13 @@ import Spinner from '../components/ui/Spinner';
 
 export default function Profile() {
     const { user } = useAuth();
-    const [activeTab, setActiveTab] = useState('integrations'); // Default to integrations per user request
+    const { theme, setTheme } = useTheme();
+    const [activeTab, setActiveTab] = useState('integrations');
     const [groqKey, setGroqKey] = useState('');
     const [isValidating, setIsValidating] = useState(false);
     const [validationResult, setValidationResult] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
 
-    // Fetch existing settings on mount
     useEffect(() => {
         const fetchSettings = async () => {
             if (!user?.id) return;
@@ -37,7 +37,6 @@ export default function Profile() {
         fetchSettings();
     }, [user?.id]);
 
-    // Statistics Protection
     const { data: tasks } = useApi(user?.id ? `${import.meta.env.VITE_API_BASE_URL}/analyze/tasks?user_id=${user.id}` : null);
     const completedCount = tasks?.length || 0;
 
@@ -77,7 +76,7 @@ export default function Profile() {
                 })
             });
             if (response.ok) {
-                alert("Settings persisted to neural core.");
+                alert("Settings persisted.");
             } else {
                 alert("Failed to save settings.");
             }
@@ -90,24 +89,23 @@ export default function Profile() {
 
     const tabs = [
         { id: 'integrations', label: 'AI Integrations', icon: Zap },
-        { id: 'account', label: 'User Identity', icon: User },
         { id: 'preferences', label: 'System Tuning', icon: Settings },
+        { id: 'account', label: 'User Identity', icon: User },
     ];
 
     return (
-        <div className="max-w-5xl mx-auto space-y-10">
-            {/* Settings Header */}
+        <div className="max-w-5xl mx-auto space-y-10 pb-20 px-4 md:px-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-none">
-                        System <span className="text-accent-gold">Settings</span>
+                    <h1 className="text-3xl md:text-5xl font-bold text-surface-900 dark:text-white tracking-tight leading-none">
+                        System <span className="text-brand-500 dark:text-brand-500">Settings</span>
                     </h1>
-                    <p className="text-wood-500 text-[10px] font-black uppercase tracking-[0.4em] mt-3 flex items-center gap-2">
-                        Control Center / Configuration Node <div className="w-1.5 h-1.5 bg-accent-gold rounded-full animate-pulse" />
+                    <p className="text-surface-500 dark:text-wood-500 text-sm md:text-[10px] font-medium md:font-black md:uppercase tracking-wide md:tracking-[0.4em] mt-3 flex items-center gap-2">
+                        Control Center / Configuration Node <span className="w-1.5 h-1.5 bg-brand-500 dark:bg-brand-500 rounded-full animate-pulse" />
                     </p>
                 </div>
 
-                <div className="flex bg-wood-950/40 p-1.5 rounded-2xl border border-white/5 backdrop-blur-xl shrink-0">
+                <div className="flex bg-surface-100 dark:bg-wood-950/40 p-1.5 rounded-xl border border-surface-200 dark:border-white/5 backdrop-blur-xl shrink-0 overflow-x-auto">
                     {tabs.map((tab) => {
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.id;
@@ -115,17 +113,16 @@ export default function Profile() {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-3 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-accent-gold text-wood-950 shadow-xl shadow-accent-gold/20' : 'text-wood-500 hover:text-wood-200 hover:bg-white/5'}`}
+                                className={`flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2.5 md:py-3 rounded-lg md:rounded-xl text-xs md:text-[10px] font-semibold md:font-black md:uppercase md:tracking-widest transition-all whitespace-nowrap ${isActive ? 'bg-white dark:bg-brand-500 text-brand-600 dark:text-wood-950 shadow-sm dark:shadow-xl dark:shadow-brand-500/20' : 'text-surface-500 dark:text-wood-500 hover:text-surface-900 dark:hover:text-wood-200 hover:bg-surface-50 dark:hover:bg-white/5'}`}
                             >
                                 <Icon size={14} />
-                                <span className="hidden sm:inline">{tab.label}</span>
+                                <span>{tab.label}</span>
                             </button>
                         );
                     })}
                 </div>
             </div>
 
-            {/* Main Configuration Panels */}
             <AnimatePresence mode="wait">
                 {activeTab === 'integrations' && (
                     <motion.div
@@ -135,40 +132,40 @@ export default function Profile() {
                         exit={{ opacity: 0, y: -10 }}
                         className="space-y-8"
                     >
-                        <Card className="p-10 bg-wood-900/40 border-white/5 relative overflow-hidden glass-panel">
-                            <div className="absolute top-0 right-0 p-10 opacity-[0.03] pointer-events-none text-accent-gold">
+                        <Card className="p-8 md:p-10 bg-white dark:bg-wood-900/40 border-surface-200 dark:border-white/5 shadow-sm dark:shadow-none relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-10 opacity-[0.02] dark:opacity-[0.03] pointer-events-none text-brand-500 dark:text-brand-500">
                                 <Terminal size={240} />
                             </div>
 
-                            <div className="mb-10 max-w-2xl">
-                                <h3 className="text-2xl font-black text-white tracking-tighter mb-2 flex items-center gap-3">
-                                    <div className="w-2 h-8 bg-accent-gold rounded-full" />
+                            <div className="mb-10 max-w-2xl relative z-10">
+                                <h3 className="text-xl md:text-2xl font-bold dark:font-black text-surface-900 dark:text-white tracking-tight mb-2 flex items-center gap-3">
+                                    <div className="w-1.5 md:w-2 h-6 md:h-8 bg-brand-500 dark:bg-brand-500 rounded-full" />
                                     Groq Intelligence Handshake
                                 </h3>
-                                <p className="text-[10px] font-black text-wood-500 leading-relaxed uppercase tracking-wider">
+                                <p className="text-sm md:text-[10px] font-medium md:font-black text-surface-500 dark:text-wood-500 leading-relaxed md:uppercase md:tracking-wider">
                                     Connect your Groq Cloud node to enable high-fidelity neural analysis. Keys are validated in real-time against Groq infrastructure.
                                 </p>
                             </div>
 
                             <div className="space-y-8 relative z-10">
                                 <div className="space-y-4">
-                                    <label className="text-[10px] font-black text-wood-500 uppercase tracking-widest flex items-center gap-2 italic">
-                                        <Lock size={12} className="text-accent-gold" /> Secure Groq API Key
+                                    <label className="text-xs md:text-[10px] font-semibold md:font-black text-surface-500 dark:text-wood-500 md:uppercase md:tracking-widest flex items-center gap-2 italic">
+                                        <Lock size={12} className="text-brand-500 dark:text-brand-500" /> Secure Groq API Key
                                     </label>
-                                    <div className="flex flex-col md:flex-row gap-4">
+                                    <div className="flex flex-col lg:flex-row gap-4">
                                         <div className="relative flex-1 group">
-                                            <Key className="absolute left-5 top-1/2 -translate-y-1/2 text-wood-800 group-focus-within:text-accent-gold transition-colors" size={20} />
+                                            <Key className="absolute left-5 top-1/2 -translate-y-1/2 text-surface-400 dark:text-wood-800 group-focus-within:text-brand-500 dark:group-focus-within:text-brand-500 transition-colors" size={20} />
                                             <input
                                                 type="password"
                                                 placeholder="gsk_********************************"
                                                 value={groqKey}
                                                 onChange={(e) => setGroqKey(e.target.value)}
-                                                className="w-full bg-wood-950/60 border-2 border-white/5 focus:border-accent-gold/40 rounded-2xl py-6 pl-14 pr-6 text-accent-gold font-mono text-sm tracking-widest placeholder:text-wood-900 focus:outline-none transition-all focus:ring-4 focus:ring-accent-gold/5"
+                                                className="w-full bg-surface-50 dark:bg-wood-950/60 border-2 border-surface-200 dark:border-white/5 focus:border-brand-400 dark:focus:border-brand-500/40 rounded-xl py-4 md:py-6 pl-14 pr-6 text-surface-900 dark:text-brand-500 font-mono text-sm tracking-widest placeholder:text-surface-400 dark:placeholder:text-wood-900 focus:outline-none transition-all focus:ring-4 focus:ring-brand-50 dark:focus:ring-brand-500/5"
                                             />
                                         </div>
                                         <Button
                                             variant="primary"
-                                            className="px-12 py-5 rounded-2xl font-black uppercase tracking-widest text-xs h-auto bg-accent-gold text-wood-950 shadow-2xl shadow-accent-gold/20"
+                                            className="px-8 md:px-12 py-4 md:py-5 rounded-xl font-bold md:font-black md:uppercase md:tracking-widest text-sm md:text-xs h-auto bg-brand-500 hover:bg-brand-600 dark:bg-brand-500 dark:hover:bg-white dark:text-wood-950 shadow-md dark:shadow-2xl dark:shadow-brand-500/20"
                                             onClick={handleValidateKey}
                                             loading={isValidating}
                                             disabled={!groqKey.trim()}
@@ -184,23 +181,23 @@ export default function Profile() {
                                             initial={{ opacity: 0, scale: 0.95 }}
                                             animate={{ opacity: 1, scale: 1 }}
                                             exit={{ opacity: 0, scale: 0.95 }}
-                                            className={`p-6 rounded-3xl flex items-center justify-between border ${validationResult.success ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-400' : 'bg-red-500/5 border-red-500/20 text-red-500'}`}
+                                            className={`p-6 rounded-2xl md:rounded-3xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border ${validationResult.success ? 'bg-green-50 dark:bg-emerald-500/5 border-green-200 dark:border-emerald-500/20 text-green-800 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-500/5 border-red-200 dark:border-red-500/20 text-red-800 dark:text-red-500'}`}
                                         >
-                                            <div className="flex items-center gap-5">
-                                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${validationResult.success ? 'bg-emerald-500/10' : 'bg-red-500/10'}`}>
+                                            <div className="flex items-center gap-4 md:gap-5">
+                                                <div className={`shrink-0 w-12 h-12 rounded-xl md:rounded-2xl flex items-center justify-center ${validationResult.success ? 'bg-green-100 dark:bg-emerald-500/10' : 'bg-red-100 dark:bg-red-500/10'}`}>
                                                     {validationResult.success ? <CheckCircle2 size={24} /> : <AlertCircle size={24} />}
                                                 </div>
                                                 <div>
-                                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] mb-1">Pipeline Status</div>
-                                                    <div className="text-sm font-black italic tracking-tight">{validationResult.message}</div>
+                                                    <div className="text-xs md:text-[10px] font-semibold md:font-black md:uppercase md:tracking-[0.2em] mb-1">Pipeline Status</div>
+                                                    <div className="text-sm font-bold italic tracking-tight">{validationResult.message}</div>
                                                 </div>
                                             </div>
                                             {validationResult.success && (
                                                 <Button
-                                                    variant="ghost"
+                                                    variant={theme === 'dark' ? 'ghost' : 'secondary'}
                                                     onClick={handleSaveSettings}
                                                     loading={isSaving}
-                                                    className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/20 px-8 rounded-xl font-black text-[10px] uppercase tracking-widest"
+                                                    className="w-full md:w-auto bg-green-100 hover:bg-green-200 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 text-green-700 dark:text-emerald-400 border-green-200 dark:border-emerald-500/20 px-8 rounded-xl font-bold md:font-black text-sm md:text-[10px] md:uppercase md:tracking-widest"
                                                 >
                                                     Persist Key
                                                 </Button>
@@ -209,25 +206,54 @@ export default function Profile() {
                                     )}
                                 </AnimatePresence>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-10 border-t border-white/5 mt-10">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-10 border-t border-surface-100 dark:border-white/5 mt-10">
                                     <IntegrationFeature icon={Zap} title="Extreme Ingest" desc="Llama 3.3 Powered" />
                                     <IntegrationFeature icon={Globe} title="Neural Sync" desc="Multi-Lingual" />
                                     <IntegrationFeature icon={Shield} title="Vault Protection" desc="Hardware AES" />
                                 </div>
                             </div>
                         </Card>
+                    </motion.div>
+                )}
 
-                        <Card className="p-8 bg-wood-900/40 border-white/5 border-dashed border-2 flex items-center justify-between group">
-                            <div className="flex items-center gap-6">
-                                <div className="w-14 h-14 rounded-2xl bg-wood-950 border border-white/5 flex items-center justify-center text-wood-700 shadow-inner group-hover:text-accent-gold transition-colors">
-                                    <Activity size={24} />
-                                </div>
-                                <div>
-                                    <h4 className="text-[10px] font-black text-wood-600 uppercase tracking-widest mb-1 italic">Auxiliary Intelligence</h4>
-                                    <p className="text-[9px] font-bold text-wood-800 uppercase leading-relaxed">Multi-Agent orchestration with OpenAI and Anthropic coming in next release phase.</p>
-                                </div>
+                {activeTab === 'preferences' && (
+                    <motion.div
+                        key="preferences"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="space-y-8"
+                    >
+                        <Card className="p-8 md:p-10 bg-white dark:bg-wood-900/40 border-surface-200 dark:border-white/5 shadow-sm dark:shadow-none dark:glass-panel">
+                            <div className="mb-10">
+                                <h3 className="text-2xl font-bold dark:font-black text-surface-900 dark:text-white dark:italic tracking-tight mb-2">Display Mode</h3>
+                                <p className="text-sm md:text-[10px] font-medium md:font-black text-surface-500 dark:text-wood-600 md:uppercase md:tracking-widest">Select your visual interface environment</p>
                             </div>
-                            <Badge variant="wood" className="py-2 px-6">BETA ACCESS</Badge>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-b border-surface-100 dark:border-white/5 pb-10 mb-10">
+                                <button onClick={() => setTheme('light')} className={`p-6 rounded-2xl border-2 flex flex-col items-center justify-center gap-4 transition-all ${theme === 'light' ? 'border-brand-500 bg-brand-50/50 dark:bg-transparent dark:border-brand-500' : 'border-surface-200 bg-white dark:bg-wood-950 dark:border-white/5 hover:border-surface-300 dark:hover:border-white/10'}`}>
+                                    <div className={`p-3 rounded-full ${theme === 'light' ? 'bg-brand-100 text-brand-600 dark:bg-brand-500/20 dark:text-brand-500' : 'bg-surface-100 text-surface-500 dark:bg-white/5 dark:text-wood-500'}`}>
+                                        <Sun size={24} />
+                                    </div>
+                                    <span className="text-sm font-semibold text-surface-900 dark:text-white">Calm Light</span>
+                                </button>
+
+                                <button onClick={() => setTheme('dark')} className={`p-6 rounded-2xl border-2 flex flex-col items-center justify-center gap-4 transition-all ${theme === 'dark' ? 'border-brand-500 bg-brand-50/50 dark:bg-transparent dark:border-brand-500' : 'border-surface-200 bg-white dark:bg-wood-950 dark:border-white/5 hover:border-surface-300 dark:hover:border-white/10'}`}>
+                                    <div className={`p-3 rounded-full ${theme === 'dark' ? 'bg-brand-100 text-brand-600 dark:bg-brand-500/20 dark:text-brand-500' : 'bg-surface-100 text-surface-500 dark:bg-white/5 dark:text-wood-500'}`}>
+                                        <Moon size={24} />
+                                    </div>
+                                    <span className="text-sm font-semibold text-surface-900 dark:text-white">Industrial Dark</span>
+                                </button>
+                            </div>
+
+                            <div className="mb-8">
+                                <h3 className="text-2xl font-bold dark:font-black text-surface-900 dark:text-white dark:italic tracking-tight mb-2">Neural Tuner</h3>
+                                <p className="text-sm md:text-[10px] font-medium md:font-black text-surface-500 dark:text-wood-600 md:uppercase md:tracking-widest">Adjust global processing parameters</p>
+                            </div>
+                            <div className="space-y-4">
+                                <TuneRow title="Neural Telemetry" active={true} desc="Real-time performance broadcasting" />
+                                <TuneRow title="Auto-Summarization" active={false} desc="Passive content distillation" />
+                                <TuneRow title="Multi-Lingual Bridge" active={true} desc="Cross-translation engine" />
+                            </div>
                         </Card>
                     </motion.div>
                 )}
@@ -239,46 +265,25 @@ export default function Profile() {
                         animate={{ opacity: 1 }}
                         className="space-y-8"
                     >
-                        <Card className="p-12 bg-wood-900/40 border-white/5 flex flex-col items-center text-center glass-panel">
+                        <Card className="p-8 md:p-12 bg-white dark:bg-wood-900/40 border-surface-200 dark:border-white/5 shadow-sm dark:shadow-none flex flex-col items-center text-center dark:glass-panel">
                             <div className="relative mb-8 group">
-                                <div className="w-36 h-36 rounded-[2.5rem] bg-accent-gold flex items-center justify-center text-wood-950 shadow-2xl relative z-10">
-                                    <User size={56} />
+                                <div className="w-24 h-24 md:w-36 md:h-36 rounded-full md:rounded-[2.5rem] bg-brand-100 dark:bg-brand-500 flex items-center justify-center text-brand-600 dark:text-wood-950 shadow-sm dark:shadow-2xl relative z-10">
+                                    <User size={48} className="md:w-[56px] md:h-[56px]" />
                                 </div>
-                                <div className="absolute -inset-4 bg-accent-gold/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <div className="absolute -inset-4 bg-brand-400/20 dark:bg-brand-500/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                             </div>
-                            <h3 className="text-4xl font-black text-white tracking-tighter italic mb-2">{user?.name || "System Architect"}</h3>
-                            <p className="text-sm font-black text-wood-500 uppercase tracking-widest">{user?.email || "admin@videoneural.ai"}</p>
-                            <div className="mt-12 flex gap-4 w-full max-w-md">
-                                <Button variant="secondary" size="lg" className="flex-1 py-5 rounded-3xl font-black uppercase text-[10px] tracking-[0.2em] border-white/5">Modify Vault</Button>
-                                <Button variant="secondary" size="lg" className="flex-1 py-5 rounded-3xl font-black uppercase text-[10px] tracking-[0.2em] text-red-500 border-red-500/10 hover:bg-red-500/5">Terminate</Button>
+                            <h3 className="text-3xl md:text-4xl font-bold md:font-black text-surface-900 dark:text-white dark:tracking-tighter dark:italic mb-2">{user?.name || "System Architect"}</h3>
+                            <p className="text-sm font-medium md:font-black text-surface-500 dark:text-wood-500 md:uppercase md:tracking-widest">{user?.email || "admin@videoneural.ai"}</p>
+                            <div className="mt-12 flex flex-col sm:flex-row gap-4 w-full max-w-md">
+                                <Button variant="secondary" size="lg" className="flex-1 py-4 md:py-5 rounded-xl md:rounded-3xl font-semibold md:font-black md:uppercase text-sm md:text-[10px] md:tracking-[0.2em] dark:border-white/5">Modify Vault</Button>
+                                <Button variant="secondary" size="lg" className="flex-1 py-4 md:py-5 rounded-xl md:rounded-3xl font-semibold md:font-black md:uppercase text-sm md:text-[10px] md:tracking-[0.2em] text-red-600 dark:text-red-500 border-red-200 bg-red-50 hover:bg-red-100 dark:bg-transparent dark:border-red-500/10 dark:hover:bg-red-500/5">Terminate</Button>
                             </div>
                         </Card>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                             <MetricBox label="Inference Tokens" value={completedCount * 1280} icon={Activity} />
                             <MetricBox label="Optimization" value="99.9%" icon={CheckCircle2} />
                         </div>
-                    </motion.div>
-                )}
-
-                {activeTab === 'preferences' && (
-                    <motion.div
-                        key="preferences"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="space-y-8"
-                    >
-                        <Card className="p-10 bg-wood-900/40 border-white/5 glass-panel">
-                            <div className="mb-12">
-                                <h3 className="text-2xl font-black text-white italic tracking-tighter mb-2">Neural Tuner</h3>
-                                <p className="text-[10px] font-black text-wood-600 uppercase tracking-widest">Adjust global processing parameters</p>
-                            </div>
-                            <div className="space-y-4">
-                                <TuneRow title="Neural Telemetry" active={true} desc="Real-time performance broadcasting" />
-                                <TuneRow title="Auto-Summarization" active={false} desc="Passive content distillation" />
-                                <TuneRow title="Multi-Lingual Bridge" active={true} desc="Cross-translation engine" />
-                            </div>
-                        </Card>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -289,12 +294,12 @@ export default function Profile() {
 function IntegrationFeature({ icon: Icon, title, desc }) {
     return (
         <div className="flex items-center gap-4 group">
-            <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-wood-600 group-hover:text-accent-gold transition-colors border border-white/5">
+            <div className="w-12 h-12 rounded-xl md:rounded-2xl bg-surface-50 dark:bg-white/5 flex items-center justify-center text-surface-600 dark:text-wood-600 group-hover:text-brand-500 dark:group-hover:text-brand-500 transition-colors border border-surface-200 dark:border-white/5">
                 <Icon size={20} />
             </div>
             <div>
-                <div className="text-[10px] font-black text-white uppercase tracking-tight">{title}</div>
-                <div className="text-[9px] font-bold text-wood-700 uppercase tracking-widest">{desc}</div>
+                <div className="text-xs md:text-[10px] font-semibold md:font-black text-surface-900 dark:text-white md:uppercase tracking-tight">{title}</div>
+                <div className="text-[10px] md:text-[9px] font-medium md:font-bold text-surface-500 dark:text-wood-700 md:uppercase md:tracking-widest">{desc}</div>
             </div>
         </div>
     );
@@ -302,27 +307,27 @@ function IntegrationFeature({ icon: Icon, title, desc }) {
 
 function MetricBox({ label, value, icon: Icon }) {
     return (
-        <Card className="p-8 bg-wood-950/40 border-white/5 flex items-center justify-between group glass-panel">
-            <div className="flex items-center gap-5">
-                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-wood-700 group-hover:text-accent-gold transition-colors">
-                    <Icon size={24} />
+        <Card className="p-6 md:p-8 bg-white dark:bg-wood-950/40 border-surface-200 dark:border-white/5 shadow-sm dark:shadow-none flex items-center justify-between group dark:glass-panel">
+            <div className="flex items-center gap-4 md:gap-5">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-surface-50 dark:bg-white/5 flex items-center justify-center text-surface-600 dark:text-wood-700 group-hover:text-brand-500 dark:group-hover:text-brand-500 transition-colors">
+                    <Icon size={20} className="md:w-6 md:h-6" />
                 </div>
-                <span className="text-[10px] font-black text-wood-500 uppercase tracking-widest">{label}</span>
+                <span className="text-xs md:text-[10px] font-medium md:font-black text-surface-500 dark:text-wood-500 md:uppercase md:tracking-widest">{label}</span>
             </div>
-            <span className="text-3xl font-black italic text-white tracking-tighter shadow-sm">{value}</span>
+            <span className="text-2xl md:text-3xl font-bold md:font-black dark:italic text-surface-900 dark:text-white tracking-tighter dark:shadow-sm">{value}</span>
         </Card>
     );
 }
 
 function TuneRow({ title, active, desc }) {
     return (
-        <div className="p-8 rounded-[2rem] bg-black/20 border border-white/5 flex items-center justify-between hover:bg-black/30 transition-colors">
+        <div className="p-6 md:p-8 rounded-2xl md:rounded-[2rem] bg-surface-50 dark:bg-black/20 border border-surface-200 dark:border-white/5 flex items-center justify-between hover:bg-surface-100 dark:hover:bg-black/30 transition-colors">
             <div>
-                <div className="text-xs font-black text-white uppercase tracking-tight mb-1">{title}</div>
-                <div className="text-[10px] font-bold text-wood-700 uppercase italic tracking-wide">{desc}</div>
+                <div className="text-sm md:text-xs font-semibold md:font-black text-surface-900 dark:text-white md:uppercase tracking-tight mb-1">{title}</div>
+                <div className="text-xs md:text-[10px] font-medium md:font-bold text-surface-500 dark:text-wood-700 md:uppercase dark:italic tracking-wide">{desc}</div>
             </div>
-            <div className={`w-14 h-7 rounded-full relative transition-all cursor-pointer ${active ? 'bg-accent-gold shadow-lg shadow-accent-gold/20' : 'bg-wood-950'}`}>
-                <div className={`absolute top-1 w-5 h-5 rounded-full shadow-md transition-all ${active ? 'left-8 bg-wood-950' : 'left-1 bg-wood-800'}`} />
+            <div className={`w-12 h-6 md:w-14 md:h-7 rounded-full relative transition-all cursor-pointer ${active ? 'bg-brand-500 dark:bg-brand-500 shadow-md dark:shadow-lg dark:shadow-brand-500/20' : 'bg-surface-300 dark:bg-wood-950'}`}>
+                <div className={`absolute top-1 w-4 h-4 md:w-5 md:h-5 rounded-full bg-white transition-all ${active ? 'left-7 md:left-8 dark:bg-wood-950 shadow-sm' : 'left-1 dark:bg-wood-800 shadow-sm'}`} />
             </div>
         </div>
     );

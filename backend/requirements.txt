@@ -17,3 +17,5 @@ aiosqlite
 requests
 fpdf2
 cryptography
+celery
+redis

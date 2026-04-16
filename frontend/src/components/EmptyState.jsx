@@ -11,24 +11,24 @@ export default function EmptyState({ title, message, actionVisible = true }) {
             <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="w-24 h-24 bg-indigo-500/10 rounded-[2.5rem] flex items-center justify-center mb-8 border border-indigo-500/20 shadow-2xl shadow-indigo-500/10"
+                className="w-20 h-20 bg-surface-100 rounded-3xl flex items-center justify-center mb-6 border border-surface-200"
             >
-                <FileSearch size={40} className="text-indigo-400" />
+                <FileSearch size={32} className="text-surface-400" />
             </motion.div>
 
-            <h2 className="text-2xl font-black text-white mb-3 italic tracking-tight">{title}</h2>
-            <p className="text-slate-500 max-w-sm mb-10 font-medium leading-relaxed">
+            <h2 className="text-xl font-semibold text-surface-900 mb-2">{title}</h2>
+            <p className="text-surface-500 max-w-sm mb-8 text-sm">
                 {message}
             </p>
 
             {actionVisible && (
                 <Button
                     variant="primary"
-                    size="lg"
+                    size="md"
                     icon={Plus}
                     onClick={() => navigate('/new')}
                 >
-                    Begin First Session
+                    Create New Analysis
                 </Button>
             )}
         </div>

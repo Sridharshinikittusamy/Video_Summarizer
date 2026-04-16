@@ -21,21 +21,21 @@ export default function Button({
     ...props
 }) {
     const variants = {
-        primary: "bg-accent-gold hover:bg-white text-wood-950 shadow-xl shadow-accent-gold/10 border-accent-gold/20 font-black tracking-widest uppercase",
-        secondary: "bg-wood-800 hover:bg-wood-700 text-wood-100 border-white/5 shadow-inner",
-        ghost: "bg-transparent hover:bg-white/5 text-wood-500 hover:text-accent-gold border-transparent",
-        danger: "bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/20",
-        glass: "bg-white/5 hover:bg-white/10 text-white backdrop-blur-md border-white/10"
+        primary: "bg-brand-500 hover:bg-brand-600 text-white shadow-sm border-transparent font-medium dark:text-wood-950 dark:shadow-lg dark:shadow-brand-500/20",
+        secondary: "bg-white hover:bg-surface-50 text-surface-700 border border-surface-200 shadow-sm font-medium dark:bg-wood-900/40 dark:hover:bg-wood-800/40 dark:text-wood-300 dark:border-white/5",
+        ghost: "bg-transparent hover:bg-surface-100 text-surface-600 font-medium dark:hover:bg-white/5 dark:text-wood-500 dark:hover:text-wood-200",
+        danger: "bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 font-medium dark:bg-red-500/10 dark:hover:bg-red-500/20 dark:text-red-500 dark:border-red-500/20",
+        glass: "bg-white/80 hover:bg-white text-surface-900 border border-surface-200 font-medium backdrop-blur-md dark:bg-wood-950/40 dark:hover:bg-wood-900 dark:border-white/5 dark:text-wood-100"
     };
 
     const sizes = {
-        sm: "px-3 py-1.5 text-xs rounded-lg gap-1.5",
-        md: "px-5 py-2.5 text-sm rounded-xl gap-2",
-        lg: "px-8 py-4 text-base rounded-2xl gap-3"
+        sm: "px-3 py-1.5 text-xs rounded-md gap-1.5",
+        md: "px-4 py-2 text-sm rounded-lg gap-2",
+        lg: "px-6 py-3 text-base rounded-lg gap-2"
     };
 
     const baseStyles = cn(
-        "relative flex items-center justify-center font-bold transition-all border outline-none focus:ring-2 focus:ring-accent-gold/40 disabled:opacity-50 disabled:cursor-not-allowed",
+        "relative flex items-center justify-center transition-colors border outline-none focus:ring-2 focus:ring-sage-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed",
         variants[variant],
         sizes[size],
         className
@@ -44,7 +44,7 @@ export default function Button({
     const content = (
         <>
             {loading ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-surface-300 border-t-sage-600 rounded-full animate-spin" />
             ) : (
                 <>
                     {Icon && <Icon size={size === 'sm' ? 14 : size === 'lg' ? 20 : 18} />}
@@ -58,7 +58,6 @@ export default function Button({
     if (Component === Link) {
         return (
             <motion.div
-                whileHover={!disabled && !loading ? { scale: 1.02, y: -1 } : {}}
                 whileTap={!disabled && !loading ? { scale: 0.98 } : {}}
                 className="inline-block"
             >
@@ -73,7 +72,6 @@ export default function Button({
     if (Component === 'a') {
         return (
             <motion.div
-                whileHover={!disabled && !loading ? { scale: 1.02, y: -1 } : {}}
                 whileTap={!disabled && !loading ? { scale: 0.98 } : {}}
                 className="inline-block"
             >
@@ -86,7 +84,6 @@ export default function Button({
 
     return (
         <motion.button
-            whileHover={!disabled && !loading ? { scale: 1.02, y: -1 } : {}}
             whileTap={!disabled && !loading ? { scale: 0.98 } : {}}
             className={baseStyles}
             disabled={disabled || loading}

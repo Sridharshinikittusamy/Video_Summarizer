@@ -1,19 +1,10 @@
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Form, UploadFile, File
+from fastapi import APIRouter, HTTPException, Form, UploadFile, File
 from app.schemas.task import TaskResponse
 from app.db.supabase_client import supabase
-from app.services.audio_service import (
-    download_youtube_audio, process_local_audio,
-    ensure_input_folder, INPUT_DIR, get_youtube_title_quick
-)
-from app.services.transcription_service import get_transcript_async
-from app.services.summarizer_service import (
-    detect_video_type, generate_report_async, generate_quiz_async,
-    translate_report_async, translate_transcript_async, dict_to_md
-)
-from app.services.pdf_service import generate_pdf
-from app.services.vision_service import extract_frames, extract_yt_frames
+from app.services.audio_service import ensure_input_folder, INPUT_DIR, get_youtube_title_quick
 from app.core.security import encrypt_key, decrypt_key
 from app.services.email_service import send_report_email
+from app.workers.processor import process_video_task_celery
 import uuid
 import shutil
 import asyncio
@@ -224,7 +215,7 @@ async def process_video_task(
         # --- STEP 2: TRANSCRIPTION ---
         if not transcript_text:
             if not audio_path or not os.path.exists(audio_path):
-                raise Exception("No audio file to process")
+                raise Exception("No audio file found on disk to process")
             print(f"🎙️ Transcribing {title}...")
             # Transcription now uses user key if available
             transcript_text = await get_transcript_async(audio_path, api_key=user_key)
@@ -312,13 +303,8 @@ async def process_video_task(
         cleanup_assets(task_id, audio_path)
 
 
-# ============================================================
-# ENDPOINTS
-# ============================================================
-
 @router.post("/youtube", response_model=TaskResponse)
 async def analyze_youtube(
-    background_tasks: BackgroundTasks,
     url: str = Form(...),
     language: str = Form("English"),
     user_id: str = Form(...)
@@ -326,7 +312,6 @@ async def analyze_youtube(
     try:
         print(f"📥 Received YouTube Task: {url} for user {user_id}")
         
-        # FIX: Fetch title quickly BEFORE creating task to avoid "Handshake" placeholder
         video_title = get_youtube_title_quick(url)
         
         res = supabase.table("video_tasks").insert({
@@ -340,12 +325,12 @@ async def analyze_youtube(
         
         task_id = res.data[0]['id']
         
-        background_tasks.add_task(
-            process_video_task, 
+        # Trigger Celery Worker
+        process_video_task_celery.delay(
             task_id, "youtube", url, language
         )
         
-        return TaskResponse(task_id=task_id, message="Analysis pipeline engaged.")
+        return TaskResponse(task_id=task_id, message="Distributed node worker dispatched.")
     except Exception as e:
         print(f"❌ API Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -353,7 +338,6 @@ async def analyze_youtube(
 
 @router.post("/file", response_model=TaskResponse)
 async def analyze_file(
-    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     language: str = Form("English"),
     user_id: str = Form(...)
@@ -379,12 +363,12 @@ async def analyze_file(
         
         task_id = res.data[0]['id']
         
-        background_tasks.add_task(
-            process_video_task, 
+        # Trigger Celery Worker
+        process_video_task_celery.delay(
             task_id, "file", safe_filename, language
         )
         
-        return TaskResponse(task_id=task_id, message="Ingestion complete. Node processing started.")
+        return TaskResponse(task_id=task_id, message="Ingestion complete. Distributed node processing started.")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

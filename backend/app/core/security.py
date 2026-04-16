@@ -1,13 +1,10 @@
-import os
 import io
 from cryptography.fernet import Fernet
-from dotenv import load_dotenv
-
-load_dotenv()
+from app.core.config import settings
 
 def get_cipher():
-    # Load from environment variables
-    key = os.getenv("ENCRYPTION_KEY")
+    # Load from centralized settings
+    key = settings.encryption_key_clean
     if not key:
         return None
     try:

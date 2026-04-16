@@ -54,7 +54,10 @@ export default function Login() {
               <input
                 type="email"
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2"
+                style={{
+                  '--tw-ring-color': 'var(--primary)'
+                }}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -64,7 +67,10 @@ export default function Login() {
               <input
                 type="password"
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2"
+                style={{
+                  '--tw-ring-color': 'var(--primary)'
+                }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -73,7 +79,14 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-900 text-white py-3 rounded-lg font-bold hover:bg-blue-800 transition-colors disabled:opacity-50"
+              className="w-full text-white py-3 rounded-lg font-bold transition-colors disabled:opacity-50"
+              style={{
+                background: 'var(--primary)',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.7 : 1
+              }}
+              onMouseOver={e => e.currentTarget.style.background = 'var(--primary-hover)'}
+              onMouseOut={e => e.currentTarget.style.background = 'var(--primary)'}
             >
               {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Sign Up')}
             </button>
@@ -82,7 +95,8 @@ export default function Login() {
           <div className="mt-6 text-center">
             <button
               onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm hover:underline"
+              style={{ color: 'var(--primary)' }}
             >
               {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
             </button>
